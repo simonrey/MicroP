@@ -395,24 +395,9 @@
               <FilePath>.\Sources\fput_debug.c</FilePath>
             </File>
             <File>
-              <FileName>FIR_asm.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\FIR_asm.s</FilePath>
-            </File>
-            <File>
-              <FileName>Assembly-2.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\Sources\Assembly-2.s</FilePath>
-            </File>
-            <File>
               <FileName>fpflr.s</FileName>
               <FileType>2</FileType>
               <FilePath>.\fpflr.s</FilePath>
-            </File>
-            <File>
-              <FileName>Assembly-3.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\Sources\Assembly-3.s</FilePath>
             </File>
           </Files>
         </Group>
