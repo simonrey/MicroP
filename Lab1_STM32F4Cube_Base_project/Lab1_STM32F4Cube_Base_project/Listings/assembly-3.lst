@@ -1,0 +1,65 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ;AREA FIR_Filter, CODE, READONLY
+    2 00000000         
+    3 00000000         ;EXPORT FIR_asm
+    4 00000000         
+    5 00000000         ;FIR_asm
+    6 00000000         ;;r0 input array
+    7 00000000         ;;r1 output array
+    8 00000000         ;;r2 size
+    9 00000000         ;;r3 coefficients array
+   10 00000000         
+   11 00000000         ;;r4 input
+   12 00000000         ;;r5 coefficient
+   13 00000000         ;;r6 storage counter
+   14 00000000         ;;r7 output
+   15 00000000         ;PUSH {lr}
+   16 00000000         ;sub r2, r2, #4
+   17 00000000         ;mov r8, #0
+   18 00000000         ;mov r6, #0
+   19 00000000         ;ldr r7, [r1,r8]
+   20 00000000         ;bl loadNextItem
+   21 00000000         
+   22 00000000         
+   23 00000000         ;loadNextItem
+   24 00000000         ;ldr r5, [r3,r8]
+   25 00000000         ;add r8, r8, r6
+   26 00000000         ;ldr r4, [r0,r8]
+   27 00000000         ;sub r8, r8, r6
+   28 00000000         ;bl loopA
+   29 00000000         
+   30 00000000         ;loopA
+   31 00000000         ;mla r7, r4, r5, r7
+   32 00000000         ;cmp r8, #16
+   33 00000000         ;beq anew
+   34 00000000         ;add r8, r8, #4
+   35 00000000         ;bl loadNextItem
+   36 00000000         
+   37 00000000         ;anew
+   38 00000000         ;str r7, [r1,r6]
+   39 00000000         ;add r6, r6, #4
+   40 00000000         ;sub r2, r2, #1
+   41 00000000         ;cmp r2, #0
+   42 00000000         ;beq terminate
+   43 00000000         ;mov r8, #0
+   44 00000000         ;mov r7, #0
+   45 00000000         ;bl loadNextItem
+   46 00000000         
+   47 00000000         ;terminate
+   48 00000000         ;POP{LR}
+   49 00000000         ;END
+                       
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
+erwork --depend=.\objects\assembly-3.d -o.\objects\assembly-3.o -I"\vmware-host
+\Shared Folders\Desktop\Lab1_STM32F4Cube_Base_project\Lab1_STM32F4Cube_Base_pro
+ject\RTE\_Lab_1" -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.0\CMSIS\Include -IC:\Keil_
+v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+ --predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 522" --predefi
+ne="_RTE_ SETA 1" --predefine="STM32F407xx SETA 1" --list=.\listings\assembly-3
+.lst Sources\Assembly-3.s
+334 symbols in table

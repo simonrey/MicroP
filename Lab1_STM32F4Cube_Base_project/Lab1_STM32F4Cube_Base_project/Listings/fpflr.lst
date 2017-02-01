@@ -1,0 +1,156 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             FIR_Filter, CODE, READONLY
+    2 00000000         
+    3 00000000                 EXPORT           FIR_asm
+    4 00000000         ;;r0, input, r1, output, r2, size, r3, inputcoeffs
+    5 00000000         
+    6 00000000         ;;s5, multiplications will accumulate here
+    7 00000000         ;;r6, loop count
+    8 00000000         ;;r2, loop threshold
+    9 00000000         
+   10 00000000         FIR_asm
+   11 00000000         
+   12 00000000 B500            PUSH             {lr}
+   13 00000002 F04F 0604       MOV              r6, #4
+   14 00000006 F1A2 0204       SUB              r2, r2, #4
+   15 0000000A FB02 F206       MUL              r2, r2, r6
+   16 0000000E EB01 0602       ADD              r6, r1, r2
+   17 00000012         
+   18 00000012         
+   19 00000012         start
+   20 00000012 ED93 3A00       VLDR.F32         s6, [r3,#0]
+   21 00000016 EDD0 3A00       VLDR.F32         s7, [r0,#0]
+   22 0000001A EE63 2A23       VMUL.F32         s5, s6, s7  ; this resets s5 to
+                                                             zero then adds ins
+                                                            tead of accumulatin
+                                                            g 
+   23 0000001E         
+   24 0000001E ED93 3A01       VLDR.F32         s6, [r3,#4]
+   25 00000022 EDD0 3A01       VLDR.F32         s7, [r0,#4]
+   26 00000026 EEE3 2A23       VFMA.F32         s5, s6, s7
+   27 0000002A         
+   28 0000002A ED93 3A02       VLDR.F32         s6, [r3,#8]
+   29 0000002E EDD0 3A02       VLDR.F32         s7, [r0,#8]
+   30 00000032 EEE3 2A23       VFMA.F32         s5, s6, s7
+   31 00000036         
+   32 00000036 ED93 3A03       VLDR.F32         s6, [r3,#12]
+   33 0000003A EDD0 3A03       VLDR.F32         s7, [r0,#12]
+   34 0000003E EEE3 2A23       VFMA.F32         s5, s6, s7
+   35 00000042         
+   36 00000042 ED93 3A04       VLDR.F32         s6, [r3,#16]
+   37 00000046 EDD0 3A04       VLDR.F32         s7, [r0,#16]
+   38 0000004A EEE3 2A23       VFMA.F32         s5, s6, s7
+   39 0000004E         
+   40 0000004E EDC1 2A00       VSTR.F32         s5, [r1]
+   41 00000052         
+   42 00000052 F101 0104       ADD              r1,r1,#4
+   43 00000056 F100 0004       ADD              r0,r0,#4
+   44 0000005A 42B1            CMP              r1, r6
+   45 0000005C D000            beq              return
+   46 0000005E         
+   47 0000005E E7D8            b                start
+   48 00000060         
+   49 00000060         return
+   50 00000060 F85D EB04       POP              {lr}
+   51 00000064         
+   52 00000064         ;mov r8, #0
+   53 00000064         
+   54 00000064         
+   55 00000064         ;bl loadnext
+   56 00000064         ;bl loopA
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   57 00000064         
+   58 00000064         
+   59 00000064         ;loadnext
+   60 00000064         ;ldr r4, [r0,r8]
+   61 00000064         ;ldr r5, [r3,r8]
+   62 00000064         ;ldr r7, [r1,r8]
+   63 00000064         ;mov PC, r14
+   64 00000064         
+   65 00000064         ;loopA
+   66 00000064         ;mul r7, r4, r5
+   67 00000064         ;cmp r8, #0
+   68 00000064         ;beq first
+   69 00000064         ;bne other
+   70 00000064         
+   71 00000064         ;first
+   72 00000064         ;str r7, [r1,r8]
+   73 00000064         ;add r8, r8, #4
+   74 00000064         ;sub r2, r2, #1
+   75 00000064         ;bl loadnext
+   76 00000064         ;bl loopA
+   77 00000064         ;other
+   78 00000064         ;sub r2, r2, #1
+   79 00000064         ;sub r8, r8, #4
+   80 00000064         ;ldr r4, [r1,r8]
+   81 00000064         ;add r7, r7, r4
+   82 00000064         ;add r8, r8, #4
+   83 00000064         ;str r7, [r1,r8]
+   84 00000064         ;add r8, r8, #4
+   85 00000064         ;cmp r2, #0
+   86 00000064         ;beq terminate
+   87 00000064         ;bl loadnext
+   88 00000064         ;bl loopA
+   89 00000064         
+   90 00000064         ;terminate
+   91 00000064         ;POP {lr}
+   92 00000064         
+   93 00000064         ;END
+                       
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
+erwork --depend=.\objects\fpflr.d -o.\objects\fpflr.o -I"\vmware-host\Shared Fo
+lders\Desktop\Lab1_STM32F4Cube_Base_project\Lab1_STM32F4Cube_Base_project\RTE\_
+Lab_1" -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.0\CMSIS\Include -IC:\Keil_v5\ARM\PAC
+K\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predefi
+ne="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 522" --predefine="_RTE_ 
+SETA 1" --predefine="STM32F407xx SETA 1" --list=.\listings\fpflr.lst fpflr.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+FIR_Filter 00000000
+
+Symbol: FIR_Filter
+   Definitions
+      At line 1 in file fpflr.s
+   Uses
+      None
+Comment: FIR_Filter unused
+FIR_asm 00000000
+
+Symbol: FIR_asm
+   Definitions
+      At line 10 in file fpflr.s
+   Uses
+      At line 3 in file fpflr.s
+Comment: FIR_asm used once
+return 00000060
+
+Symbol: return
+   Definitions
+      At line 49 in file fpflr.s
+   Uses
+      At line 45 in file fpflr.s
+Comment: return used once
+start 00000012
+
+Symbol: start
+   Definitions
+      At line 19 in file fpflr.s
+   Uses
+      At line 47 in file fpflr.s
+Comment: start used once
+4 symbols
+339 symbols in table
