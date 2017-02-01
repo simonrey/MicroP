@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "arm_math.h"
 
 typedef struct 
@@ -83,23 +84,108 @@ int main()
 	printf("finished calculating differences\n");
 	
 // calculating averages
-	float32_t averageCMSIS = 0;
-	float32_t averageC = 0;
-	float32_t averageASM = 0;
+	float32_t averageCMSIS 	= 0;
+	float32_t averageC 			= 0;
+	float32_t averageASM 		= 0;
+	float32_t averageInput  = 0;
+	float32_t averageOutputCMSIS = 0;
+	float32_t averageOutputC = 0;
+	float32_t averageOutputASM = 0;
 	
 	for(int i = 0; i < (blockSize - order); i++) 
 	{
+		averageInput = inputs[i]     + averageInput;
+		averageOutputCMSIS= outputsCMSIS[i+order] + averageOutputCMSIS;
+		averageOutputC = outputsC[i] + averageOutputC;
+		averageOutputASM = outputsASM[i] + averageOutputASM;
+		
 		averageCMSIS = differenceCMSIS[i] + averageCMSIS;
 		averageC		 = differenceC[i] 		+ averageC;
 		averageASM	 = differenceASM[i] 	+ averageCMSIS;
 	}
 	
+	averageInput = (averageInput/(float)(blockSize-order));
+	averageOutputCMSIS = (averageOutputCMSIS/(float)(blockSize-order));
+	averageOutputC = (averageOutputC/(float)(blockSize-order));
+	averageOutputASM = (averageOutputASM/(float)(blockSize - order));
+	
 	averageCMSIS	= (averageCMSIS/(float)(blockSize - order));
 	averageC 			= (averageC/(float)(blockSize - order));
 	averageASM 		= (averageASM/(float)(blockSize - order));
 	
-	printf("cmsis %f, c %f, asm %f", averageCMSIS, averageC, averageASM);
+	printf("average for input %f CMSIS %f, c %f, asm %f \n", averageInput, averageOutputCMSIS, averageOutputC, averageOutputASM);
+	
+	printf("averages for cmsis %f, c %f, asm %f \n", averageCMSIS, averageC, averageASM);
 // calculating standard deviations
+	float32_t stdCMSIS 	= 0;
+	float32_t stdC 			= 0;
+	float32_t stdASM 		= 0;
+	float32_t stdOutputC = 0;
+	float32_t stdOutputASM = 0;
+	float32_t stdOutputCMSIS = 0;
+	float32_t stdInput = 0;
+	
+	//calculating (difference - average)^2
+	for(int i = 0; i < (blockSize - order); i++) 
+	{
+		
+		stdCMSIS = pow((differenceCMSIS[i] 	- averageCMSIS),2) 	+ stdCMSIS;
+		stdC		 = pow((differenceC[i] 			- averageC),2) 			+ stdC;
+		stdASM	 = pow((differenceASM[i] 		- averageASM),2) 		+ stdASM;
+		
+		stdOutputC = pow((outputsC[i]-averageOutputC),2) + stdOutputC;
+		stdOutputASM = pow((outputsASM[i]-averageOutputASM),2) + stdOutputASM;
+		stdOutputCMSIS = pow((outputsCMSIS[i+order]-averageOutputCMSIS),2) + stdOutputCMSIS;
+		stdInput = pow((inputs[i]-averageInput),2) + stdInput;
+		
+	}
+
+	
+	printf("sums for cmsis %f, c %f, asm %f\n", stdCMSIS, stdC, stdASM);
+	stdCMSIS	= (stdCMSIS/(float)(blockSize - order));
+	stdC 			= (stdC/(float)(blockSize - order));
+	stdASM 		= (stdASM/(float)(blockSize - order));
+	
+	printf("pre sqrt for cmsis %f, c %f, asm %f\n", stdCMSIS, stdC, stdASM);
+	
+	stdCMSIS	=	sqrt(stdCMSIS);
+	stdC			=	sqrt(stdC);
+	stdASM		=	sqrt(stdASM);
+	
+	printf("standard deviations for cmsis %f, c %f, asm %f\n", stdCMSIS, stdC, stdASM);
+
+	stdOutputC = (stdOutputC/(float)(blockSize-order));
+	stdOutputASM = (stdOutputASM/(float)(blockSize-order));
+	stdOutputCMSIS = (stdOutputCMSIS/(float)(blockSize-order));
+	stdInput = (stdInput/(float)(blockSize-order));
+	
+	stdOutputC = sqrt(stdOutputC);
+	stdOutputASM = sqrt(stdOutputASM);
+	stdOutputCMSIS = sqrt(stdOutputCMSIS);
+	stdInput = sqrt(stdInput);
+	
+	printf("standard deviations for input %f, cmsis %f, c %f, asm %f\n", stdInput, stdOutputCMSIS, stdOutputC, stdOutputASM);
+
+	
+	float32_t correlationCMSIS = 0;
+	float32_t correlationC = 0;
+	float32_t correlationASM = 0;
+	
+	for(int i = 0; i < blockSize-order; i++){
+		
+		correlationCMSIS = (inputs[i]-averageInput) * (outputsCMSIS[i+order]-averageOutputCMSIS) + correlationCMSIS;
+		correlationC = (inputs[i] - averageInput) * (outputsC[i] - averageOutputC) + correlationC;
+		correlationASM = (inputs[i] - averageInput) * (outputsASM[i] - averageOutputASM) + correlationASM;
+		
+	}
+	
+	correlationCMSIS = correlationCMSIS / ((stdInput * stdOutputCMSIS)*(blockSize-order));
+	correlationC = correlationC / ((stdInput * stdOutputC)*(blockSize-order));
+	correlationASM = correlationASM / ((stdInput * stdOutputASM)*(blockSize-order));
+		
+	printf("correlations CMSIS %f, c %f, asm %f\n", correlationCMSIS, correlationC, correlationASM);
+
+
 	
 // calculating correlations
 	
