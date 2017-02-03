@@ -74,14 +74,16 @@ int main()
 	float32_t differenceC[blockSize - order];
 	float32_t differenceASM[blockSize - order];
 		
-	printf("calculating differences\n");
 	for(int i = 0; i < (blockSize - order); i++) 
 	{
 		differenceCMSIS[i] 	= inputs[i] - outputsCMSIS[i + order];
 		differenceC[i] 			= inputs[i] - outputsC[i];
 		differenceASM[i] 		= inputs[i] - outputsASM[i];
 	}
-	printf("finished calculating differences\n");
+	printf("\nC Statistic Implementation Results\n");
+	for(int i = 0; i < blockSize-order; i++){
+		printf("Differences - ASM: %f\tC: %f\tCMSIS: %f\n", differenceASM[i], differenceC[i], differenceCMSIS[i]);
+	}
 	
 // calculating averages
 	float32_t averageCMSIS 	= 0;
@@ -98,25 +100,24 @@ int main()
 		averageOutputCMSIS= outputsCMSIS[i+order] + averageOutputCMSIS;
 		averageOutputC = outputsC[i] + averageOutputC;
 		averageOutputASM = outputsASM[i] + averageOutputASM;
-		
 		averageCMSIS = differenceCMSIS[i] + averageCMSIS;
 		averageC		 = differenceC[i] 		+ averageC;
-		averageASM	 = differenceASM[i] 	+ averageCMSIS;
+		averageASM	 = differenceASM[i] 	+ averageASM;
 	}
 	
 	averageInput = (averageInput/(float)(blockSize-order));
 	averageOutputCMSIS = (averageOutputCMSIS/(float)(blockSize-order));
 	averageOutputC = (averageOutputC/(float)(blockSize-order));
 	averageOutputASM = (averageOutputASM/(float)(blockSize - order));
-	
 	averageCMSIS	= (averageCMSIS/(float)(blockSize - order));
 	averageC 			= (averageC/(float)(blockSize - order));
 	averageASM 		= (averageASM/(float)(blockSize - order));
 	
-	printf("average for input %f CMSIS %f, c %f, asm %f \n", averageInput, averageOutputCMSIS, averageOutputC, averageOutputASM);
+	//printf("average for input %f CMSIS %f, c %f, asm %f \n", averageInput, averageOutputCMSIS, averageOutputC, averageOutputASM);
 	
-	printf("averages for cmsis %f, c %f, asm %f \n", averageCMSIS, averageC, averageASM);
-// calculating standard deviations
+	printf("Mean - ASM: %f\tC: %f\tCMSIS: %f\n", averageASM, averageC, averageCMSIS);
+
+	// calculating standard deviations
 	float32_t stdCMSIS 	= 0;
 	float32_t stdC 			= 0;
 	float32_t stdASM 		= 0;
@@ -132,7 +133,6 @@ int main()
 		stdCMSIS = pow((differenceCMSIS[i] 	- averageCMSIS),2) 	+ stdCMSIS;
 		stdC		 = pow((differenceC[i] 			- averageC),2) 			+ stdC;
 		stdASM	 = pow((differenceASM[i] 		- averageASM),2) 		+ stdASM;
-		
 		stdOutputC = pow((outputsC[i]-averageOutputC),2) + stdOutputC;
 		stdOutputASM = pow((outputsASM[i]-averageOutputASM),2) + stdOutputASM;
 		stdOutputCMSIS = pow((outputsCMSIS[i+order]-averageOutputCMSIS),2) + stdOutputCMSIS;
@@ -140,31 +140,23 @@ int main()
 		
 	}
 
-	
-	printf("sums for cmsis %f, c %f, asm %f\n", stdCMSIS, stdC, stdASM);
 	stdCMSIS	= (stdCMSIS/(float)(blockSize - order));
 	stdC 			= (stdC/(float)(blockSize - order));
-	stdASM 		= (stdASM/(float)(blockSize - order));
-	
-	printf("pre sqrt for cmsis %f, c %f, asm %f\n", stdCMSIS, stdC, stdASM);
-	
+	stdASM 		= (stdASM/(float)(blockSize - order));	
 	stdCMSIS	=	sqrt(stdCMSIS);
 	stdC			=	sqrt(stdC);
 	stdASM		=	sqrt(stdASM);
-	
-	printf("standard deviations for cmsis %f, c %f, asm %f\n", stdCMSIS, stdC, stdASM);
 
 	stdOutputC = (stdOutputC/(float)(blockSize-order));
 	stdOutputASM = (stdOutputASM/(float)(blockSize-order));
 	stdOutputCMSIS = (stdOutputCMSIS/(float)(blockSize-order));
 	stdInput = (stdInput/(float)(blockSize-order));
-	
 	stdOutputC = sqrt(stdOutputC);
 	stdOutputASM = sqrt(stdOutputASM);
 	stdOutputCMSIS = sqrt(stdOutputCMSIS);
 	stdInput = sqrt(stdInput);
-	
-	printf("standard deviations for input %f, cmsis %f, c %f, asm %f\n", stdInput, stdOutputCMSIS, stdOutputC, stdOutputASM);
+
+	printf("Standard Deviations - ASM: %f\tC: %f\tCMSIS: %f\n", stdASM, stdC, stdCMSIS);
 
 	
 	float32_t correlationCMSIS = 0;
@@ -179,16 +171,62 @@ int main()
 		
 	}
 	
+	
 	correlationCMSIS = correlationCMSIS / ((stdInput * stdOutputCMSIS)*(blockSize-order));
 	correlationC = correlationC / ((stdInput * stdOutputC)*(blockSize-order));
 	correlationASM = correlationASM / ((stdInput * stdOutputASM)*(blockSize-order));
 		
-	printf("correlations CMSIS %f, c %f, asm %f\n", correlationCMSIS, correlationC, correlationASM);
+	printf("Correlation - ASM: %f\tC: %f\tCMSIS: %f\n", correlationASM, correlationC, correlationCMSIS);
 
 
+	//CMSIS Part II
+	
+	
+	
+	//Part A - Taking Differences
+	arm_sub_f32(inputs, outputsASM, differenceASM, blockSize-order);
+	arm_sub_f32(inputs, outputsC, differenceC, blockSize-order);
+	arm_sub_f32(inputs, &outputsCMSIS[order], differenceCMSIS, blockSize-order);
+	
+	//Part B - Standard Deviation
+	
+	
+	arm_std_f32(differenceASM, blockSize-order, &stdASM);
+	arm_std_f32(differenceC, blockSize-order, &stdC);
+	arm_std_f32(differenceCMSIS, blockSize-order, &stdCMSIS);
+	
+	//Part B - Find the mean of the differences
+	
+	arm_mean_f32(differenceASM, blockSize-order, &averageASM);
+	arm_mean_f32(differenceC, blockSize-order, &averageC);
+	arm_mean_f32(differenceCMSIS, blockSize-order, &averageCMSIS);
+	
+	//Part C - Find the correlation between original and tracked vectors
+	
+	correlationASM = 0;
+	correlationC = 0;
+	correlationCMSIS = 0;
+	
+	arm_correlate_f32(inputs, blockSize-order, outputsASM, blockSize-order, &correlationASM);
+	arm_correlate_f32(inputs, blockSize-order, outputsC, blockSize-order, &correlationC);
+	arm_correlate_f32(inputs, blockSize-order, &outputsCMSIS[order], blockSize-order, &correlationCMSIS);
+	
+	
+	printf("\nCMSIS DSP Lib results\n");
+	for(int i = 0; i < blockSize-order; i++){
+		printf("Differences - ASM: %f\tC: %f\tCMSIS: %f\n", differenceASM[i], differenceC[i], differenceCMSIS[i]);
+	}
+	printf("Mean - ASM: %f\tC: %f\tCMSIS: %f\n", averageASM, averageC, averageCMSIS);
+	printf("Standard Deviations - ASM: %f\tC: %f\tCMSIS: %f\n", stdASM, stdC, stdCMSIS);
+	printf("Correlation - ASM: %f\tC: %f\tCMSIS: %f\n", correlationASM, correlationC, correlationCMSIS);
+	
+	
+	
+	
 	
 // calculating correlations
 	
 	return 0;
 }
 
+ 
