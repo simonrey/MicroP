@@ -86,41 +86,41 @@ int main()
 	}
 	
 // calculating averages
-	float32_t averageCMSIS 	= 0;
-	float32_t averageC 			= 0;
-	float32_t averageASM 		= 0;
-	float32_t averageInput  = 0;
+	float32_t averageCMSIS = 0;
+	float32_t averageC = 0;
+	float32_t averageASM = 0;
+	float32_t averageInput = 0;
 	float32_t averageOutputCMSIS = 0;
 	float32_t averageOutputC = 0;
 	float32_t averageOutputASM = 0;
 	
 	for(int i = 0; i < (blockSize - order); i++) 
 	{
-		averageInput = inputs[i]     + averageInput;
-		averageOutputCMSIS= outputsCMSIS[i+order] + averageOutputCMSIS;
+		averageInput = inputs[i] + averageInput;
+		averageOutputCMSIS= outputsCMSIS[i + order] + averageOutputCMSIS;
 		averageOutputC = outputsC[i] + averageOutputC;
 		averageOutputASM = outputsASM[i] + averageOutputASM;
 		averageCMSIS = differenceCMSIS[i] + averageCMSIS;
-		averageC		 = differenceC[i] 		+ averageC;
-		averageASM	 = differenceASM[i] 	+ averageASM;
+		averageC = differenceC[i] + averageC;
+		averageASM = differenceASM[i] + averageASM;
 	}
 	
 	averageInput = (averageInput/(float)(blockSize-order));
 	averageOutputCMSIS = (averageOutputCMSIS/(float)(blockSize-order));
 	averageOutputC = (averageOutputC/(float)(blockSize-order));
 	averageOutputASM = (averageOutputASM/(float)(blockSize - order));
-	averageCMSIS	= (averageCMSIS/(float)(blockSize - order));
-	averageC 			= (averageC/(float)(blockSize - order));
-	averageASM 		= (averageASM/(float)(blockSize - order));
+	averageCMSIS = (averageCMSIS/(float)(blockSize - order));
+	averageC = (averageC/(float)(blockSize - order));
+	averageASM = (averageASM/(float)(blockSize - order));
 	
 	//printf("average for input %f CMSIS %f, c %f, asm %f \n", averageInput, averageOutputCMSIS, averageOutputC, averageOutputASM);
 	
 	printf("Mean - ASM: %f\tC: %f\tCMSIS: %f\n", averageASM, averageC, averageCMSIS);
 
 	// calculating standard deviations
-	float32_t stdCMSIS 	= 0;
-	float32_t stdC 			= 0;
-	float32_t stdASM 		= 0;
+	float32_t stdCMSIS = 0;
+	float32_t stdC = 0;
+	float32_t stdASM = 0;
 	float32_t stdOutputC = 0;
 	float32_t stdOutputASM = 0;
 	float32_t stdOutputCMSIS = 0;
@@ -130,13 +130,13 @@ int main()
 	for(int i = 0; i < (blockSize - order); i++) 
 	{
 		
-		stdCMSIS = pow((differenceCMSIS[i] 	- averageCMSIS),2) 	+ stdCMSIS;
-		stdC		 = pow((differenceC[i] 			- averageC),2) 			+ stdC;
-		stdASM	 = pow((differenceASM[i] 		- averageASM),2) 		+ stdASM;
-		stdOutputC = pow((outputsC[i]-averageOutputC),2) + stdOutputC;
-		stdOutputASM = pow((outputsASM[i]-averageOutputASM),2) + stdOutputASM;
-		stdOutputCMSIS = pow((outputsCMSIS[i+order]-averageOutputCMSIS),2) + stdOutputCMSIS;
-		stdInput = pow((inputs[i]-averageInput),2) + stdInput;
+		stdCMSIS = pow((differenceCMSIS[i] 	- averageCMSIS), 2) + stdCMSIS;
+		stdC = pow((differenceC[i] - averageC), 2) + stdC;
+		stdASM = pow((differenceASM[i] - averageASM), 2) + stdASM;
+		stdOutputC = pow((outputsC[i] - averageOutputC), 2) + stdOutputC;
+		stdOutputASM = pow((outputsASM[i] - averageOutputASM), 2) + stdOutputASM;
+		stdOutputCMSIS = pow((outputsCMSIS[i + order] - averageOutputCMSIS), 2) + stdOutputCMSIS;
+		stdInput = pow((inputs[i]-averageInput), 2) + stdInput;
 		
 	}
 
