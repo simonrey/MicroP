@@ -332,7 +332,7 @@ void ADC_Setup(void){
 
 void GPIO_Setup(void){
 	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE();
 	
 	//Input pin PA0 for button
 	GPIO_InitTypeDef init_gpio;
@@ -342,13 +342,20 @@ void GPIO_Setup(void){
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOA, &init_gpio);
 	
-	//Output on GPIOB -- Need 13 pins, just decided to hit all of them on for now
-	init_gpio.Pin = ((GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6  | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15));
+	//Output on GPIOE -- Digit control lines
+	init_gpio.Pin = ((GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6  | GPIO_PIN_7));
 	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	init_gpio.Pull = GPIO_PULLDOWN;
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOE, &init_gpio);
 
+	//Output on GPIOE -- Segment control lines
+	init_gpio.Pin = ((GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15));
+	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
+	init_gpio.Pull = GPIO_PULLUP;
+	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+	
 }
 
 void SystemClock_Config(void)
