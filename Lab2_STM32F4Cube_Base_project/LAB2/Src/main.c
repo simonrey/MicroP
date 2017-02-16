@@ -313,8 +313,6 @@ int SegmentDecoder(int toDecode, int * segArr, int digit){
 				segArr[7] = 0;//h
 				break;
 		}
-		(*place)++;
-		toDecode = toDecode/10;
 	return isNegative;
 }
 
