@@ -45,6 +45,7 @@ ADC_HandleTypeDef adc1;
 
 struct segments{
 	int SEG[8];
+	int digit;
 	int VALUE;
 	struct segments * NEXT_SEGMENT;
 };
@@ -57,6 +58,11 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place);
 int TemperatureFormula(int OutADC);
 int CtoF(int temperatureC);
 int WriteToPin(int isNegative, struct segments * segment, int place);
+
+int setSegmentSelectLineHigh(int digit, struct segments * segment0);
+int setDigitSelectLinesHigh(int digit);
+int setDigitSelectLinesZero(void);
+int setSegmentSelectLinesOne(void);
 
 
 int main(void)
@@ -76,9 +82,13 @@ int main(void)
 	struct segments seg3;
 	
 	seg0.NEXT_SEGMENT = &seg1;
+	seg0.digit = 0;
 	seg1.NEXT_SEGMENT = &seg2;
+	seg1.digit = 1;
 	seg2.NEXT_SEGMENT = &seg3;
+	seg2.digit = 2;
 	seg3.NEXT_SEGMENT = &seg0;
+	seg3.digit = 3;
 	
   
   while (1)
@@ -132,6 +142,62 @@ int WriteToPin(int isNegative, struct segments * segment, int place){
 	
 	return 0;
 	
+}
+
+int updateDigit(int temperature, int digit, struct segments * segment0){
+	
+	setDigitSelectLinesZero();
+	setSegmentSelectLinesOne();
+	SegmentDecoder(temperature, segment0,0);
+	setDigitSelectLinesHigh(digit);
+	setSegmentSelectLineHigh(digit, segment0);
+	
+	return 0;
+	
+}
+int setDigitSelectLinesHigh(int digit){
+	
+	HAL_GPIO_WritePin(GPIOE, (uint16_t)digit, GPIO_PIN_SET); 
+	return 0;
+}
+
+int setSegmentSelectLineHigh(int digit, struct segments * segment0){
+	struct segments * s = segment0;
+	if(s->digit == digit){
+		if(s->SEG[0]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+		if(s->SEG[1]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+		if(s->SEG[2]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+		if(s->SEG[3]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
+		if(s->SEG[4]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+		if(s->SEG[5]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+		if(s->SEG[6]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
+		if(s->SEG[7]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);
+	}
+	else{
+		s = s->NEXT_SEGMENT;
+	}
+	return 0;
+}
+
+int setDigitSelectLinesZero(void){
+	
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+	return 0;
+}
+
+int setSegmentSelectLinesOne(void){
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);	
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);
+	return 0;
 }
 
 int CtoF(int temperatureC){
@@ -277,11 +343,11 @@ void GPIO_Setup(void){
 	HAL_GPIO_Init(GPIOA, &init_gpio);
 	
 	//Output on GPIOB -- Need 13 pins, just decided to hit all of them on for now
-	init_gpio.Pin = GPIO_PIN_All;
+	init_gpio.Pin = ((GPIO_PIN_4 || GPIO_PIN_5 || GPIO_PIN_6 || GPIO_PIN_7 || GPIO_PIN_8 || GPIO_PIN_9 || GPIO_PIN_10 || GPIO_PIN_11 || GPIO_PIN_12 || GPIO_PIN_13 || GPIO_PIN_14 || GPIO_PIN_15));
 	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	init_gpio.Pull = GPIO_PULLDOWN;
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
-	HAL_GPIO_Init(GPIOB, &init_gpio);
+	HAL_GPIO_Init(GPIOE, &init_gpio);
 
 }
 
