@@ -38,6 +38,7 @@
 /* USER CODE BEGIN 0 */
 
 extern ADC_HandleTypeDef ADC1_Handle;
+extern DMA_HandleTypeDef DMA1_Handle;
 
 void configureADC()
 {
@@ -45,14 +46,27 @@ void configureADC()
 	HAL_ADC_MspInit(&ADC1_Handle);
 	//int ADCclkEnableErrorCode = __HAL_RCC_ADC_CLK_ENABLE(); 
 	//printf("ADC CLK enabled with error code: %i \n", ADCclkEnableErrorCode);
-	configureGPIO();
-	
+
 	
 	
 	
 	
 	__GPIOC_CLK_ENABLE();
   __ADC1_CLK_ENABLE();
+	__HAL_RCC_DMA1_CLK_ENABLE();
+
+	
+	DMA1_Handle.Instance = DMA1_Stream0;
+	DMA1_Handle.Init.Channel = DMA_CHANNEL_0;
+	DMA1_Handle.Init.Direction = DMA_PERIPH_TO_MEMORY;
+	DMA1_Handle.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+	DMA1_Handle.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+	DMA1_Handle.Init.MemInc = DMA_MINC_DISABLE;
+	DMA1_Handle.Init.Mode = DMA_CIRCULAR;
+	DMA1_Handle.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+	DMA1_Handle.Init.PeriphInc = DMA_PINC_DISABLE;
+	DMA1_Handle.Init.Priority = DMA_PRIORITY_HIGH;
+//	HAL_DMA_Init(&DMA1_Handle);
 
 	ADC1_Handle.Instance = ADC1;
 	ADC1_Handle.Init.ClockPrescaler 				= ADC_CLOCKPRESCALER_PCLK_DIV4;
@@ -62,9 +76,10 @@ void configureADC()
 	ADC1_Handle.Init.DiscontinuousConvMode	= DISABLE;
 	ADC1_Handle.Init.ExternalTrigConvEdge		= ADC_EXTERNALTRIGINJECCONVEDGE_NONE;
 	ADC1_Handle.Init.DataAlign							= ADC_DATAALIGN_RIGHT;
-	
+	ADC1_Handle.DMA_Handle 									= &DMA1_Handle;
 	ADC1_Handle.Init.NbrOfConversion				= 1;
-	
+	__HAL_LINKDMA();
+	HAL_ADC_Start_DMA(&ADC1_Handle,
 	HAL_ADC_Init(&ADC1_Handle);
 	
 	

@@ -52,12 +52,6 @@
 * @brief This function handles System tick timer.
 */
 
-struct segments{
-	int SEG[8];
-	int digit;
-	int VALUE;
-	struct segments * NEXT_SEGMENT;
-};
 
 int updateDigit(int temperature, int digit);
 int setDigitSelectLinesHigh(int digit);
@@ -70,10 +64,7 @@ int counterTempUpdate = 0;
 int currentDigit = 0;
 int currentTemp = 0;
 
-struct segments seg0;
-struct segments seg1;
-struct segments seg2;
-struct segments seg3;
+void updateTemp();
 
 
 void SysTick_Handler(void)
@@ -89,20 +80,6 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 1 */
 	//most code should go here so that the timer is reset quickly
 	
-	seg0.NEXT_SEGMENT = &seg1;
-	seg0.digit = 0;
-	seg1.NEXT_SEGMENT = &seg2;
-	seg1.digit = 1;
-	seg2.NEXT_SEGMENT = &seg3;
-	seg2.digit = 2;
-	seg3.NEXT_SEGMENT = &seg0;
-	seg3.digit = 3;
-	
-
-	
-	
-	
-	
 	if(currentDigit > 3)
 	{
 		currentDigit = 0;
@@ -117,7 +94,7 @@ void SysTick_Handler(void)
 	{
 		currentDigit++;
 		updateDigit(currentTemp,currentDigit);
-		currentTemp = updateTemp();
+		updateTemp();
 		printf("Atemp: %i\n",currentTemp);
 		counterTempUpdate = 0;
 		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0))

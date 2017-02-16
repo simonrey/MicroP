@@ -37,29 +37,12 @@
 
 /* USER CODE BEGIN Includes */
 void GPIO_Setup();
-/* USER CODE END Includes */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
-/* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef ADC1_Handle;
-
 int rawTemp = 0;
 
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void configureADC();
 
-/* USER CODE BEGIN PFP */
-/* Private function prototypes -----------------------------------------------*/
-
-/* USER CODE END PFP */
-
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 
 int main(void)
 {
@@ -68,39 +51,23 @@ int main(void)
 	printf("heloo 1 \n");
 	printf("heloo 2\n");
 	
-  /* USER CODE END 1 */
-
-  /* MCU Configuration----------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+ 
   HAL_Init();
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	SystemClock_Config();
 
-  /* USER CODE BEGIN 2 */
-	printf("heloo 3 \n");
 	configureADC();
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
 	GPIO_Setup();
   while (1)
   {
-  /* USER CODE END WHILE */
-	
-  /* USER CODE BEGIN 3 */
+ 
 
   }
-  /* USER CODE END 3 */
+  
 
 }
 
-/** System Clock Configuration
-*/
-void SystemClock_Config(void)
-{
+void SystemClock_Config(void){
 
   RCC_OscInitTypeDef RCC_OscInitStruct;
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
@@ -134,8 +101,6 @@ void SystemClock_Config(void)
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);																					// gives systick the highest priority 
 }
-
-/* USER CODE BEGIN 4 */
 
 
 void GPIO_Setup(){
