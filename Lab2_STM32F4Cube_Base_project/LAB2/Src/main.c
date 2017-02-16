@@ -226,6 +226,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 1;//f
 				segment->SEG[6] = 1;//g
 				segment->SEG[7] = 0;//h
+				break;
 			case 1 :
 				segment->SEG[0] = 0;//a
 				segment->SEG[1] = 1;//b
@@ -235,6 +236,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 0;//f
 				segment->SEG[6] = 0;//g
 				segment->SEG[7] = 0;//h
+				break;
 			case 2 :
 				segment->SEG[0] = 1;//a
 				segment->SEG[1] = 1;//b
@@ -244,6 +246,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 0;//f
 				segment->SEG[6] = 1;//g
 				segment->SEG[7] = 0;//h
+				break;
 			case 3 :
 				segment->SEG[0] = 1;//a
 				segment->SEG[1] = 1;//b
@@ -253,6 +256,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 0;//f
 				segment->SEG[6] = 1;//g
 				segment->SEG[7] = 0;//h
+				break;
 			case 4 :
 				segment->SEG[0] = 0;//a
 				segment->SEG[1] = 1;//b
@@ -262,6 +266,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 1;//f
 				segment->SEG[6] = 1;//g
 				segment->SEG[7] = 0;//h
+				break;
 			case 5 :
 				segment->SEG[0] = 1;//a
 				segment->SEG[1] = 0;//b
@@ -271,6 +276,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 1;//f
 				segment->SEG[6] = 1;//g
 				segment->SEG[7] = 0;//h
+				break;
 			case 6 :
 				segment->SEG[0] = 1;//a
 				segment->SEG[1] = 0;//b
@@ -280,6 +286,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 1;//f
 				segment->SEG[6] = 1;//g
 				segment->SEG[7] = 0;//h
+				break;
 			case 7 :
 				segment->SEG[0] = 1;//a
 				segment->SEG[1] = 1;//b
@@ -289,6 +296,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 0;//f
 				segment->SEG[6] = 0;//g
 				segment->SEG[7] = 0;//h
+				break;
 			case 8 :
 				segment->SEG[0] = 1;//a
 				segment->SEG[1] = 1;//b
@@ -298,6 +306,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 1;//f
 				segment->SEG[6] = 1;//g
 				segment->SEG[7] = 0;//h
+				break;
 			case 9 :
 				segment->SEG[0] = 1;//a
 				segment->SEG[1] = 1;//b
@@ -307,6 +316,7 @@ int SegmentDecoder(int toDecode, struct segments * segment, int * place){
 				segment->SEG[5] = 1;//f
 				segment->SEG[6] = 1;//g
 				segment->SEG[7] = 0;//h
+				break;
 		}
 		(*place)++;
 		toDecode = toDecode/10;
