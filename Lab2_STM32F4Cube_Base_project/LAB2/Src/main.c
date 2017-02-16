@@ -54,12 +54,12 @@ struct segments{
 void SystemClock_Config(void);
 void GPIO_Setup(void);
 void ADC_Setup(void);
-int SegmentDecoder(int toDecode, struct segments * segment, int * place);
+int SegmentDecoder(int toDecode, int * segArr, int digit);
 int TemperatureFormula(int OutADC);
 int CtoF(int temperatureC);
 int WriteToPin(int isNegative, struct segments * segment, int place);
 
-int setSegmentSelectLineHigh(int digit, struct segments * segment0);
+int setSegmentSelectLineHigh(int digit,  int * segArr);
 int setDigitSelectLinesHigh(int digit);
 int setDigitSelectLinesZero(void);
 int setSegmentSelectLinesOne(void);
@@ -144,13 +144,13 @@ int WriteToPin(int isNegative, struct segments * segment, int place){
 	
 }
 
-int updateDigit(int temperature, int digit, struct segments * segment0){
+int updateDigit(int temperature, int digit, int * segArr){
 	
 	setDigitSelectLinesZero();
 	setSegmentSelectLinesOne();
-	SegmentDecoder(temperature, segment0,0);
+	SegmentDecoder(temperature, segArr, 0);
 	setDigitSelectLinesHigh(digit);
-	setSegmentSelectLineHigh(digit, segment0);
+	setSegmentSelectLineHigh(digit, segArr);
 	
 	return 0;
 	
@@ -161,21 +161,17 @@ int setDigitSelectLinesHigh(int digit){
 	return 0;
 }
 
-int setSegmentSelectLineHigh(int digit, struct segments * segment0){
-	struct segments * s = segment0;
-	if(s->digit == digit){
-		if(s->SEG[0]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
-		if(s->SEG[1]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
-		if(s->SEG[2]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
-		if(s->SEG[3]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
-		if(s->SEG[4]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
-		if(s->SEG[5]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
-		if(s->SEG[6]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
-		if(s->SEG[7]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);
-	}
-	else{
-		s = s->NEXT_SEGMENT;
-	}
+int setSegmentSelectLineHigh(int digit, int * segArr){
+	
+		if(segArr[0]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+		if(segArr[1]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+		if(segArr[2]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+		if(segArr[3]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
+		if(segArr[4]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+		if(segArr[5]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+		if(segArr[6]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
+		if(segArr[7]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);
+	
 	return 0;
 }
 
@@ -186,17 +182,18 @@ int setDigitSelectLinesZero(void){
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
 	return 0;
+	
 }
 
 int setSegmentSelectLinesOne(void){
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);	
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);//a
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);//b
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);//c
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);//d
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_RESET);//e
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);//f
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);//g
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);//h
 	return 0;
 }
 
@@ -204,124 +201,120 @@ int CtoF(int temperatureC){
 	return temperatureC*34;
 }
 
-int SegmentDecoder(int toDecode, struct segments * segment, int * place){
+int SegmentDecoder(int toDecode, int * segArr, int digit){
 	
 	int isNegative = 0;
+	toDecode = (toDecode/(10^digit)) % 10;
 	
 	if(toDecode<0){
 		toDecode = toDecode * -1;
 		isNegative = 1;
 	}
-	
-	while(toDecode){
 		
-		segment->VALUE = toDecode % 10;	
-		switch(segment->VALUE){
+		switch(toDecode){
 			case 0 :
-				segment->SEG[0] = 1;//a
-				segment->SEG[1] = 1;//b
-				segment->SEG[2] = 1;//c
-				segment->SEG[3] = 1;//d
-				segment->SEG[4] = 1;//e
-				segment->SEG[5] = 1;//f
-				segment->SEG[6] = 1;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 1;//a
+				segArr[1] = 1;//b
+				segArr[2] = 1;//c
+				segArr[3] = 1;//d
+				segArr[4] = 1;//e
+				segArr[5] = 1;//f
+				segArr[6] = 1;//g
+				segArr[7] = 0;//h
 				break;
 			case 1 :
-				segment->SEG[0] = 0;//a
-				segment->SEG[1] = 1;//b
-				segment->SEG[2] = 1;//c
-				segment->SEG[3] = 0;//d
-				segment->SEG[4] = 0;//e
-				segment->SEG[5] = 0;//f
-				segment->SEG[6] = 0;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 0;//a
+				segArr[1] = 1;//b
+				segArr[2] = 1;//c
+				segArr[3] = 0;//d
+				segArr[4] = 0;//e
+				segArr[5] = 0;//f
+				segArr[6] = 0;//g
+				segArr[7] = 0;//h
 				break;
 			case 2 :
-				segment->SEG[0] = 1;//a
-				segment->SEG[1] = 1;//b
-				segment->SEG[2] = 0;//c
-				segment->SEG[3] = 1;//d
-				segment->SEG[4] = 1;//e
-				segment->SEG[5] = 0;//f
-				segment->SEG[6] = 1;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 1;//a
+				segArr[1] = 1;//b
+				segArr[2] = 0;//c
+				segArr[3] = 1;//d
+				segArr[4] = 1;//e
+				segArr[5] = 0;//f
+				segArr[6] = 1;//g
+				segArr[7] = 0;//h
 				break;
 			case 3 :
-				segment->SEG[0] = 1;//a
-				segment->SEG[1] = 1;//b
-				segment->SEG[2] = 1;//c
-				segment->SEG[3] = 1;//d
-				segment->SEG[4] = 0;//e
-				segment->SEG[5] = 0;//f
-				segment->SEG[6] = 1;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 1;//a
+				segArr[1] = 1;//b
+				segArr[2] = 1;//c
+				segArr[3] = 1;//d
+				segArr[4] = 0;//e
+				segArr[5] = 0;//f
+				segArr[6] = 1;//g
+				segArr[7] = 0;//h
 				break;
 			case 4 :
-				segment->SEG[0] = 0;//a
-				segment->SEG[1] = 1;//b
-				segment->SEG[2] = 1;//c
-				segment->SEG[3] = 0;//d
-				segment->SEG[4] = 0;//e
-				segment->SEG[5] = 1;//f
-				segment->SEG[6] = 1;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 0;//a
+				segArr[1] = 1;//b
+				segArr[2] = 1;//c
+				segArr[3] = 0;//d
+				segArr[4] = 0;//e
+				segArr[5] = 1;//f
+				segArr[6] = 1;//g
+				segArr[7] = 0;//h
 				break;
 			case 5 :
-				segment->SEG[0] = 1;//a
-				segment->SEG[1] = 0;//b
-				segment->SEG[2] = 1;//c
-				segment->SEG[3] = 1;//d
-				segment->SEG[4] = 0;//e
-				segment->SEG[5] = 1;//f
-				segment->SEG[6] = 1;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 1;//a
+				segArr[1] = 0;//b
+				segArr[2] = 1;//c
+				segArr[3] = 1;//d
+				segArr[4] = 0;//e
+				segArr[5] = 1;//f
+				segArr[6] = 1;//g
+				segArr[7] = 0;//h
 				break;
 			case 6 :
-				segment->SEG[0] = 1;//a
-				segment->SEG[1] = 0;//b
-				segment->SEG[2] = 1;//c
-				segment->SEG[3] = 1;//d
-				segment->SEG[4] = 1;//e
-				segment->SEG[5] = 1;//f
-				segment->SEG[6] = 1;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 1;//a
+				segArr[1] = 0;//b
+				segArr[2] = 1;//c
+				segArr[3] = 1;//d
+				segArr[4] = 1;//e
+				segArr[5] = 1;//f
+				segArr[6] = 1;//g
+				segArr[7] = 0;//h
 				break;
 			case 7 :
-				segment->SEG[0] = 1;//a
-				segment->SEG[1] = 1;//b
-				segment->SEG[2] = 1;//c
-				segment->SEG[3] = 0;//d
-				segment->SEG[4] = 0;//e
-				segment->SEG[5] = 0;//f
-				segment->SEG[6] = 0;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 1;//a
+				segArr[1] = 1;//b
+				segArr[2] = 1;//c
+				segArr[3] = 0;//d
+				segArr[4] = 0;//e
+				segArr[5] = 0;//f
+				segArr[6] = 0;//g
+				segArr[7] = 0;//h
 				break;
 			case 8 :
-				segment->SEG[0] = 1;//a
-				segment->SEG[1] = 1;//b
-				segment->SEG[2] = 1;//c
-				segment->SEG[3] = 1;//d
-				segment->SEG[4] = 1;//e
-				segment->SEG[5] = 1;//f
-				segment->SEG[6] = 1;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 1;//a
+				segArr[1] = 1;//b
+				segArr[2] = 1;//c
+				segArr[3] = 1;//d
+				segArr[4] = 1;//e
+				segArr[5] = 1;//f
+				segArr[6] = 1;//g
+				segArr[7] = 0;//h
 				break;
 			case 9 :
-				segment->SEG[0] = 1;//a
-				segment->SEG[1] = 1;//b
-				segment->SEG[2] = 1;//c
-				segment->SEG[3] = 0;//d
-				segment->SEG[4] = 0;//e
-				segment->SEG[5] = 1;//f
-				segment->SEG[6] = 1;//g
-				segment->SEG[7] = 0;//h
+				segArr[0] = 1;//a
+				segArr[1] = 1;//b
+				segArr[2] = 1;//c
+				segArr[3] = 0;//d
+				segArr[4] = 0;//e
+				segArr[5] = 1;//f
+				segArr[6] = 1;//g
+				segArr[7] = 0;//h
 				break;
 		}
 		(*place)++;
 		toDecode = toDecode/10;
-		segment = segment->NEXT_SEGMENT;
-	}
 	return isNegative;
 }
 
@@ -365,6 +358,8 @@ void GPIO_Setup(void){
 	init_gpio.Pull = GPIO_PULLUP;
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOE, &init_gpio);
+	
+	
 	
 }
 
