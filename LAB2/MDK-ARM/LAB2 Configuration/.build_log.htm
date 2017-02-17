@@ -28,12 +28,30 @@ Project File Date:  02/08/2017
 *** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'LAB2 Configuration'
 compiling stm32f4xx_it.c...
-../Src/stm32f4xx_it.c(120): warning:  #223-D: function "updateTemp" declared implicitly
-                currentTemp = updateTemp();
-../Src/stm32f4xx_it.c: 1 warning, 0 errors
+../Src/stm32f4xx_it.c(70): warning:  #1295-D: Deprecated declaration filter - give arg types
+  void filter();
+../Src/stm32f4xx_it.c(108): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+                        currentDisplayTemp = (int)(((currentTemp)*1.8 + 32.0)*100.0);
+../Src/stm32f4xx_it.c(112): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+                        currentDisplayTemp = (int)((currentTemp)*100.0);;
+../Src/stm32f4xx_it.c: 3 warnings, 0 errors
+compiling adc.c...
+../Src/adc.c(41): warning:  #1295-D: Deprecated declaration ConfigureDMA - give arg types
+  void ConfigureDMA();
+../Src/adc.c(115): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+        float updatedTemp = rawTemp * 3.0;
+../Src/adc.c(117): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+        updatedTemp = updatedTemp / 4095.0;
+../Src/adc.c(118): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+        updatedTemp = updatedTemp - 0.76;
+../Src/adc.c(119): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+        updatedTemp = updatedTemp / 0.0025;
+../Src/adc.c(120): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+        updatedTemp = updatedTemp + 25.0;
+../Src/adc.c: 6 warnings, 0 errors
 linking...
-Program Size: Code=13704 RO-data=584 RW-data=28 ZI-data=1268  
-"LAB2 Configuration/\.axf" - 0 Error(s), 1 Warning(s).
+Program Size: Code=12796 RO-data=796 RW-data=52 ZI-data=1380  
+"LAB2 Configuration/\.axf" - 0 Error(s), 9 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -51,7 +69,7 @@ Package Vendor: ARM
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.0.0
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

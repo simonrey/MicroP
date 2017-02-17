@@ -37,8 +37,6 @@
 #include <math.h>
 
 /* USER CODE BEGIN 0 */
-#define V25 0.76
-#define AVG_SLOPE 2.5
 
 /* USER CODE END 0 */
 
@@ -52,20 +50,24 @@
 * @brief This function handles System tick timer.
 */
 
-
 int updateDigit(int temperature, int digit);
 int setDigitSelectLinesHigh(int digit);
-int setSegmentSelectLineHigh(int *s);
 int setDigitSelectLinesZero(void);
 int setSegmentSelectLinesZero(void);
-int* SegmentDecoder(int toDecode, int *segArr);
+int SegmentDecoder(int toDecode, int *segArr);
 
-int counterTempUpdate = 0;
+int counterDisplayTempUpdate = 0;
 int currentDigit = 0;
-int currentTemp = 0;
+extern float currentTemp;
+int currentDisplayTemp = 0;
+int filterUpdateCount = 0;
 
-void updateTemp();
+float sampleTemp;
 
+static const float coeffsArray[51] = {0.000950456065525981, 0.0032982880300802, 0.00449132702555116, -0.00147679039173661, -0.0173486722707884, -0.0322288371748662, -0.020649059911765, 0.0395767340724028, 0.141361472999714, 0.24066169296412, 0.282151127183525, 0.24066169296412, 0.141361472999714, 0.0395767340724028, -0.020649059911765, -0.0322288371748662, -0.0173486722707884, -0.00147679039173661, 0.00449132702555116, 0.0032982880300802, 0.000950456065525981};
+float pastTemperatures[50] 				= {0};
+int pastTemperaturesIndex 				= 0;
+void filter();
 
 void SysTick_Handler(void)
 {
@@ -80,36 +82,36 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 1 */
 	//most code should go here so that the timer is reset quickly
 	
+	//cycle through each digit of the display updating it with its appropriate value
+	currentDigit++;
 	if(currentDigit > 3)
 	{
-		currentDigit = 0;
+		currentDigit = 1;
 	}
-	if(counterTempUpdate == 500)
+	updateDigit(currentDisplayTemp,currentDigit);
+	
+	filterUpdateCount++;
+	if(filterUpdateCount > 10)
 	{
-//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_8, GPIO_PIN_SET);
-//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4, GPIO_PIN_SET);
+		filter();
+		filterUpdateCount = 0;
 	}
 	
-	if(counterTempUpdate == 1000)
+	//every nth tick poll for new temperature
+	counterDisplayTempUpdate++;
+	if(counterDisplayTempUpdate == 200)
 	{
-		currentDigit++;
-		updateDigit(currentTemp,currentDigit);
-		updateTemp();
-		printf("Atemp: %i\n",currentTemp);
-		counterTempUpdate = 0;
+		counterDisplayTempUpdate = 0;
+		// if the blue button is pressed give results in fahrenheit
 		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0))
 		{
-			printf("button");
+			currentDisplayTemp = (int)(((currentTemp)*1.8 + 32.0)*100.0);
 		}
-		
-//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_8, GPIO_PIN_RESET);
-//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4, GPIO_PIN_RESET);
-
+		else
+		{
+			currentDisplayTemp = (int)((currentTemp)*100.0);;
+		}
 	}
-
-	counterTempUpdate++;
-
-
   /* USER CODE END SysTick_IRQn 1 */
 }
 
@@ -122,39 +124,44 @@ void SysTick_Handler(void)
 
 
 /* USER CODE BEGIN 1 */
+//temperature is given as a four digit int, ex. 30.25C -> 3025
+//digit 0 is most significant, 3 is least
 int updateDigit(int temperature, int digit){
 	int s[8] = {0};
-	int digitValue = (int)(temperature/(pow((double)10,(double)digit))) % 10;
+	int digitValue = (int)(temperature/(pow((double)10,(double)(digit)))) % 10; //isolates the digit to be updated of the temperature
 	
-	setDigitSelectLinesZero();
-	//setSegmentSelectLinesZero();
+	setDigitSelectLinesZero(); //sets all select lines to zero so that only one digit is on at a time
 	SegmentDecoder(digitValue, s);
 	setDigitSelectLinesHigh(digit);
 	
 	return 0;
 }
 int setDigitSelectLinesHigh(int digit){
-	
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_SET); 
-	return 0;
-}
-
-int setSegmentSelectLineHigh(int *s){
-
-	if(s[0]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
-	if(s[1]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
-	if(s[2]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
-	if(s[3]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
-	if(s[4]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
-	if(s[5]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
-	if(s[6]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
-	if(s[7]==1) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);
-
+	//sets the appropriate digit select line high
+	switch(digit)
+	{
+		case 0:
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);		
+			break;
+		case 1:
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, GPIO_PIN_SET); 
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);
+			break;
+		case 2:
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);		
+			break;
+		case 3:
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_SET); 
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);
+			break;
+	}
 	return 0;
 }
 
 int setDigitSelectLinesZero(void){
-	
+	//sets all select lines to zero so that only one digit is on at a time
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, GPIO_PIN_RESET);
@@ -162,18 +169,8 @@ int setDigitSelectLinesZero(void){
 	return 0;
 }
 
-int setSegmentSelectLinesZero(void){
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);	
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);
-	return 0;
-}
-int* SegmentDecoder(int toDecode, int *segArr){
+int SegmentDecoder(int toDecode, int *segArr){
+	//puts values in segArr corresponding to the number to be displayed
 	switch(toDecode){
 		case 0 :
 			segArr[0] = 1;//a
@@ -182,7 +179,7 @@ int* SegmentDecoder(int toDecode, int *segArr){
 			segArr[3] = 1;//d
 			segArr[4] = 1;//e
 			segArr[5] = 1;//f
-			segArr[6] = 1;//g
+			segArr[6] = 0;//g
 			segArr[7] = 0;//h
 			break;
 		case 1 :
@@ -209,8 +206,8 @@ int* SegmentDecoder(int toDecode, int *segArr){
 			segArr[0] = 1;//a
 			segArr[1] = 1;//b
 			segArr[2] = 1;//c
-			segArr[3] = 1;//d
-			segArr[4] = 0;//e
+			segArr[3] = 0;//d
+			segArr[4] = 1;//e
 			segArr[5] = 0;//f
 			segArr[6] = 1;//g
 			segArr[7] = 0;//h
@@ -229,8 +226,8 @@ int* SegmentDecoder(int toDecode, int *segArr){
 			segArr[0] = 1;//a
 			segArr[1] = 0;//b
 			segArr[2] = 1;//c
-			segArr[3] = 1;//d
-			segArr[4] = 0;//e
+			segArr[3] = 0;//d
+			segArr[4] = 1;//e
 			segArr[5] = 1;//f
 			segArr[6] = 1;//g
 			segArr[7] = 0;//h
@@ -277,9 +274,91 @@ int* SegmentDecoder(int toDecode, int *segArr){
 			break;
 	}
 	
-	setSegmentSelectLineHigh(segArr);
+	//sets the segment select lines high or low for the number to be displayed, 
+	
+	if(segArr[0]==1) 
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);
+	}
+	
+	if(segArr[1]==1) 
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
+	}
+		if(segArr[2]==1) 
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);
+	}
+		if(segArr[3]==1) 
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
+	}
+		if(segArr[4]==1) 
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_RESET);
+	}
+		if(segArr[5]==1) 
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+	}
+	if(segArr[6]==1) 
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);
+	}
 
-	return segArr;
+
+	return 0;
+}
+
+void filter()
+{
+			pastTemperatures[pastTemperaturesIndex] = sampleTemp;
+			pastTemperaturesIndex++;
+			if(pastTemperaturesIndex > 50)
+			{
+				pastTemperaturesIndex = 0;
+			}
+			
+			float scratchTemp = 0;
+			for(int i = pastTemperaturesIndex; i < 51; i++)
+			{
+				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArray[i - pastTemperaturesIndex];
+			}
+			
+			for(int i = 0; i < pastTemperaturesIndex; i++)
+			{
+				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArray[i + (51 - pastTemperaturesIndex)];
+			}
+			
+			currentTemp = scratchTemp;
 }
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

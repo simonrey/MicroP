@@ -37,37 +37,54 @@
 
 /* USER CODE BEGIN Includes */
 void GPIO_Setup();
-ADC_HandleTypeDef ADC1_Handle;
-int rawTemp = 0;
+/* USER CODE END Includes */
 
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE BEGIN PV */
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void configureADC();
 
+/* USER CODE BEGIN PFP */
+/* Private function prototypes -----------------------------------------------*/
+
+/* USER CODE END PFP */
+
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
 
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
-	printf("heloo 1 \n");
-	printf("heloo 2\n");
-	
- 
+  /* USER CODE BEGIN 1 */	
+  /* USER CODE END 1 */
+  /* MCU Configuration----------------------------------------------------------*/
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-	SystemClock_Config();
-
+  /* Configure the system clock */
+  SystemClock_Config();
+  /* USER CODE BEGIN 2 */
 	configureADC();
+  /* USER CODE END 2 */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
 	GPIO_Setup();
   while (1)
   {
- 
-
+  /* USER CODE END WHILE */
+  /* USER CODE BEGIN 3 */
   }
-  
-
+  /* USER CODE END 3 */
 }
 
-void SystemClock_Config(void){
+/** System Clock Configuration
+*/
+void SystemClock_Config(void)
+{
 
   RCC_OscInitTypeDef RCC_OscInitStruct;
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
@@ -102,6 +119,8 @@ void SystemClock_Config(void){
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);																					// gives systick the highest priority 
 }
 
+/* USER CODE BEGIN 4 */
+
 
 void GPIO_Setup(){
  	__HAL_RCC_GPIOA_CLK_ENABLE();
@@ -119,22 +138,18 @@ void GPIO_Setup(){
 	HAL_GPIO_Init(GPIOA, &init_gpio);
 	
 	//Output on GPIOE -- Digit control lines
-	init_gpio.Pin = GPIO_PIN_4; //((GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6  | GPIO_PIN_7));
+	init_gpio.Pin = ((GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6  | GPIO_PIN_7));
 	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	init_gpio.Pull = GPIO_PULLDOWN;
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOE, &init_gpio);
 
 	//Output on GPIOE -- Segment control lines
-	init_gpio.Pin = GPIO_PIN_8; //((GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15));
+	init_gpio.Pin = ((GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15));
 	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	init_gpio.Pull = GPIO_PULLDOWN;
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOE, &init_gpio);
-
-	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_8, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4, GPIO_PIN_SET);
-	printf("gpio4: %i, gpio8: %i", HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4), HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_8));
 	
 }
 /* USER CODE END 4 */
