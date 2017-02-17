@@ -43,9 +43,6 @@ void GPIO_Setup();
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef ADC1_Handle;
-
-int rawTemp = 0;
 
 /* USER CODE END PV */
 
@@ -63,38 +60,25 @@ void SystemClock_Config(void);
 
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
-	printf("heloo 1 \n");
-	printf("heloo 2\n");
-	
+  /* USER CODE BEGIN 1 */	
   /* USER CODE END 1 */
-
   /* MCU Configuration----------------------------------------------------------*/
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
   /* Configure the system clock */
   SystemClock_Config();
-
   /* USER CODE BEGIN 2 */
-	printf("heloo 3 \n");
 	configureADC();
   /* USER CODE END 2 */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	GPIO_Setup();
   while (1)
   {
   /* USER CODE END WHILE */
-	
   /* USER CODE BEGIN 3 */
-
   }
   /* USER CODE END 3 */
-
 }
 
 /** System Clock Configuration
@@ -154,22 +138,18 @@ void GPIO_Setup(){
 	HAL_GPIO_Init(GPIOA, &init_gpio);
 	
 	//Output on GPIOE -- Digit control lines
-	init_gpio.Pin = GPIO_PIN_4; //((GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6  | GPIO_PIN_7));
+	init_gpio.Pin = ((GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6  | GPIO_PIN_7));
 	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	init_gpio.Pull = GPIO_PULLDOWN;
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOE, &init_gpio);
 
 	//Output on GPIOE -- Segment control lines
-	init_gpio.Pin = GPIO_PIN_8; //((GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15));
+	init_gpio.Pin = ((GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15));
 	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	init_gpio.Pull = GPIO_PULLDOWN;
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOE, &init_gpio);
-
-	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_8, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4, GPIO_PIN_SET);
-	printf("gpio4: %i, gpio8: %i", HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4), HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_8));
 	
 }
 /* USER CODE END 4 */
