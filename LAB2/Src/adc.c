@@ -45,7 +45,7 @@ extern float sampleTemp;
 
 ADC_HandleTypeDef ADC1_Handle;
 DMA_HandleTypeDef  DMA_Handle;
-uint32_t ADC1ConvertedValues[2]; 
+uint32_t ADC1ConvertedValues[1]; 
 IRQn_Type IRQ_Handle;
 void configureADC()
 {
@@ -79,7 +79,7 @@ void configureADC()
 	HAL_ADC_Start(&ADC1_Handle); // do we need this
 	
 	ConfigureDMA();
-  HAL_ADC_Start_DMA(&ADC1_Handle, ADC1ConvertedValues, 2);
+  HAL_ADC_Start_DMA(&ADC1_Handle, ADC1ConvertedValues, 1);
 }
 
  
