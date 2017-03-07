@@ -57,6 +57,9 @@
 int keyPressed = 0;
 uint16_t row;
 uint16_t col;
+int timeExpired = 0;
+
+extern TIM_HandleTypeDef tim_handle;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -162,25 +165,98 @@ void SysTick_Handler(void)
 	HAL_IncTick();
 }
 
-void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin){
-	
+void TIM2_IRQHandler(){
+	timeExpired = 1;
+}
+
+void EXTI9_5_IRQHandler(){
+
 	//Row determination
 	if(keyPressed == 0){
-		row = GPIO_Pin - 4;
+		HAL_TIM_Base_Start(&tim_handle);
+		row = 3;
 		keyPressed++;
-		InitializeGPIO(keyPressed);
+		initializeGPIO(keyPressed);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
 	}
 	//Column determination
 	if(keyPressed == 1){
-		col = GPIO_Pin - 8;
+		col = 3;
 		keyPressed++;
+		initializeGPIO(0*keyPressed);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
 	}
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	keyPressed = 0;
+void EXTI4_IRQHandler(){
+
+	//Row determination
+	if(keyPressed == 0){
+		row = 2;
+		keyPressed++;
+		initializeGPIO(keyPressed);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+	}
+	//Column determination
+	if(keyPressed == 1){
+		col = 2;
+		keyPressed++;
+		initializeGPIO(0*keyPressed);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+	}
+}
+
+void EXTI3_IRQHandler(){
+
+	//Row determination
+	if(keyPressed == 0){
+		row = 1;
+		keyPressed++;
+		initializeGPIO(keyPressed);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+	}
+	//Column determination
+	if(keyPressed == 1){
+		col = 1;
+		keyPressed++;
+		initializeGPIO(0*keyPressed);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+	}
+}
 	
-	InitializeGPIO(keyPressed);
+	void EXTI2_IRQHandler(){
+
+	//Row determination
+	if(keyPressed == 0){
+		row = 0;
+		keyPressed++;
+		initializeGPIO(keyPressed);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+	}
+	//Column determination
+	if(keyPressed == 1){
+		if(timeExpired && (row == 3)){
+			initializePitchRoll(timeExpired);
+			timeExpired = 0;
+			keyPressed = 0;
+			HAL_TIM_Base_Stop(&tim_handle);
+			HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+		}
+		else{
+			col = 0;
+			keyPressed++;
+			initializeGPIO(0*keyPressed);
+			HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+		}
+	}
+}
+
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	if(keyPressed>1){
+		getKeyPressed(row, col);
+		keyPressed = 0;
+	}
 }
 
 /******************************************************************************/

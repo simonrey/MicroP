@@ -34,7 +34,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
+#include <stdlib.h>
 /* USER CODE BEGIN 0 */
+int digitCount;
+int * pitch;
+int * roll;
 
 /* USER CODE END 0 */
 
@@ -46,68 +50,171 @@
 void InitializeGPIO(int keyPressed){
 	
 	__HAL_RCC_GPIOE_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	
+	HAL_GPIO_DeInit(GPIOA,GPIO_PIN_5);
+	HAL_GPIO_DeInit(GPIOB,GPIO_PIN_4);
+	HAL_GPIO_DeInit(GPIOC,GPIO_PIN_3);
+	HAL_GPIO_DeInit(GPIOD,GPIO_PIN_2);
+	HAL_GPIO_DeInit(GPIOE,(GPIO_PIN_5|GPIO_PIN_4|GPIO_PIN_3|GPIO_PIN_2));
 	
 	GPIO_InitTypeDef init_gpio;
 	
-	//Input on GPIOE
-	init_gpio.Pin = keyPressed ? ((GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6  | GPIO_PIN_7)):((GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11));
-	init_gpio.Mode = GPIO_MODE_INPUT;
-	init_gpio.Pull = GPIO_PULLUP;
+	
+	//PA5 - Set as input/output
+	init_gpio.Pin = (GPIO_PIN_5);
+	init_gpio.Mode = keyPressed ? GPIO_MODE_IT_FALLING : GPIO_MODE_OUTPUT_PP;
+	init_gpio.Pull = keyPressed ? GPIO_PULLUP : GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	HAL_GPIO_Init(GPIOA, &init_gpio);
+	
+	//PE5 - Set as output/input
+	init_gpio.Pin = (GPIO_PIN_5);
+	init_gpio.Mode = keyPressed ? GPIO_MODE_OUTPUT_PP : GPIO_MODE_IT_RISING;
+	init_gpio.Pull = keyPressed ? GPIO_PULLDOWN : GPIO_PULLUP;
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOE, &init_gpio);
-
-	//Output on GPIOE
-	init_gpio.Pin = keyPressed ? ((GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11)) : ((GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6  | GPIO_PIN_7));
-	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
-	init_gpio.Pull = GPIO_PULLDOWN;
+		
+	//PB4 - Set as input/output
+	init_gpio.Pin = (GPIO_PIN_4);
+	init_gpio.Mode = keyPressed ? GPIO_MODE_IT_FALLING : GPIO_MODE_OUTPUT_PP;
+	init_gpio.Pull = keyPressed ? GPIO_PULLUP : GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	HAL_GPIO_Init(GPIOB, &init_gpio);
+		
+	//PE4 - Set as output/input
+	init_gpio.Pin = (GPIO_PIN_4);
+	init_gpio.Mode = keyPressed ? GPIO_MODE_OUTPUT_PP : GPIO_MODE_IT_RISING;
+	init_gpio.Pull = keyPressed ? GPIO_PULLDOWN : GPIO_PULLUP;
 	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOE, &init_gpio);
 	
-	HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+	//PC3 - Set as input/output
+	init_gpio.Pin = (GPIO_PIN_3);
+	init_gpio.Mode = keyPressed ? GPIO_MODE_IT_FALLING : GPIO_MODE_OUTPUT_PP;
+	init_gpio.Pull = keyPressed ? GPIO_PULLUP : GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	HAL_GPIO_Init(GPIOC, &init_gpio);
+	
+	//PE3 - Set as output/input
+	init_gpio.Pin = (GPIO_PIN_3);
+	init_gpio.Mode = keyPressed ? GPIO_MODE_OUTPUT_PP : GPIO_MODE_IT_RISING;
+	init_gpio.Pull = keyPressed ? GPIO_PULLDOWN : GPIO_PULLUP;
+	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+		
+	//PD2 - Set as input/output
+	init_gpio.Pin = (GPIO_PIN_2);
+	init_gpio.Mode = keyPressed ? GPIO_MODE_IT_FALLING : GPIO_MODE_OUTPUT_PP;
+	init_gpio.Pull = keyPressed ? GPIO_PULLUP : GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	HAL_GPIO_Init(GPIOD, &init_gpio);
+		
+	//PE2 - Set as output/input
+	init_gpio.Pin = (GPIO_PIN_2);
+	init_gpio.Mode = keyPressed ? GPIO_MODE_OUTPUT_PP : GPIO_MODE_IT_RISING;
+	init_gpio.Pull = keyPressed ? GPIO_PULLDOWN : GPIO_PULLUP;
+	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+	
+	
+	HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+	
+	HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+	
+	HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+	
+	HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+	
 }
 
-void getKeyPressed(uint16_t row, uint16_t col){
+void initializeResetTimer(void){
+	RCC_APB1ENR_TIM2EN;
+
+	TIM_HandleTypeDef tim_handle;
+	tim_handle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	tim_handle.Init.CounterMode = TIM_COUNTERMODE_UP;
+	tim_handle.Init.Period = 1;
+	tim_handle.Init.Prescaler = 0;
+	
+	HAL_TIM_Base_MspInit(&tim_handle);
+	__TIM2_CLK_ENABLE();
+	HAL_TIM_Base_Init(&tim_handle);
+			
+}
+
+void initializePitchRoll(int reInit){
+	
+	if(reInit){
+		deInitPitchRoll();
+	}
+	
+	pitch = malloc(3*sizeof(int));
+	roll = malloc(3*sizeof(int));
+	digitCount = 0;
+}
+
+void deInitPitchRoll(){
+	free(pitch);
+	free(roll);
+}
+
+void getKeyPressed(int row, int col){
 	
 	int key = row*3+col;
-	
-	switch (key){
-		case 0 : 
-			
-		case 1 :
-			
-		case 2 :
-			
+	switch(key){
 		case 3 :
-			
-		case 4 :
-			
-		case 5 :
-			
-		case 6 :
-			
+			key = 10;
+			break;
 		case 7 :
-			
-		case 8 :
-			
-		case 9 :
-			
-		case 10 :
-			
+			key = 11;
+			break;
 		case 11 :
-			
-		case 12 :
-			
-		case 13 :
-			
-		case 14 :
-			
+			key = 12;
+			break;
 		case 15 :
-			
-		
+			key = 13;
+			break;
+		case 12 :
+			key = -1;
+			break;
+		case 14 :
+			key = -2;
+			break;
 	}
-		
 	
+	if(digitCount>2){
+		if(key == -2){
+			digitCount = 0;
+		}
+		if(key == -1){
+			digitCount--;
+		}
+		else{
+			roll[digitCount-3] = key;
+			digitCount++;
+		}
+	}
+	
+	if(digitCount<3){
+		if(key == -2){
+			digitCount = 3;
+		}
+		if(key == -1){
+			digitCount--;
+		}
+		else{
+			pitch[digitCount] = key;
+			digitCount++;
+		}
+	}	
 }
 
 

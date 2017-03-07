@@ -42,6 +42,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -54,7 +55,11 @@ void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 	 
-void InitializeGPIO(int keyPressed);
+void initializeGPIO(int keyPressed);
+void getKeyPressed(int row, int col);
+void initializePitchRoll(int reInit);
+void deInitPitchRoll(void);
+void initializeResetTimer(void)
 	 
 	 
 /* USER CODE END Prototypes */

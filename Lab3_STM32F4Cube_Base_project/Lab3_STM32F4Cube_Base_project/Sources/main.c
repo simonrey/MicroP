@@ -28,13 +28,20 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 	/* Init GPIO blocks*/
-	InitializeGPIO();
+	initializeResetTimer();
+	initializeGPIO(0);
+	initializePitchRoll(0);
+	
 	
   /* Initialize all configured peripherals */
 
 	while (1){
 	}
 }
+
+
+
+
 
 /** System Clock Configuration*/
 void SystemClock_Config(void){
