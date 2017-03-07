@@ -34,6 +34,28 @@ int main(void)
 	
 	
   /* Initialize all configured peripherals */
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+	HAL_NVIC_SetPriorityGrouping(2);
+	HAL_NVIC_SetPriority(EXTI0_IRQn, 2,2);
+
+
+	SPI_HandleTypeDef hspi;
+	HAL_SPI_MspInit(&hspi); // sets up gpio stuff for the SPI config and accelerometer interrupt pin
+
+	LIS3DSH_InitTypeDef LIS3DSH_InitStruct;
+	LIS3DSH_InitStruct.AA_Filter_BW							= LIS3DSH_AA_BW_50;
+	LIS3DSH_InitStruct.Axes_Enable							= LIS3DSH_XYZ_ENABLE;
+	LIS3DSH_InitStruct.Continous_Update						= LIS3DSH_ContinousUpdate_Enabled;
+	LIS3DSH_InitStruct.Full_Scale							= LIS3DSH_FULLSCALE_2;
+	LIS3DSH_InitStruct.Power_Mode_Output_DataRate					= LIS3DSH_DATARATE_25;
+	LIS3DSH_InitStruct.Self_Test							= LIS3DSH_SELFTEST_NORMAL;
+	LIS3DSH_Init(&LIS3DSH_InitStruct); // must be called before LIS3DSH_DataReadyInterruptConfig, since this also sets up the SPI configuration
+
+	LIS3DSH_DRYInterruptConfigTypeDef LIS3DSH_IntConfigStruct;
+	LIS3DSH_IntConfigStruct.Dataready_Interrupt	= LIS3DSH_DATA_READY_INTERRUPT_ENABLED;
+	LIS3DSH_IntConfigStruct.Interrupt_signal	= LIS3DSH_ACTIVE_HIGH_INTERRUPT_SIGNAL;
+	LIS3DSH_IntConfigStruct.Interrupt_type		= LIS3DSH_INTERRUPT_REQUEST_LATCHED;
+	LIS3DSH_DataReadyInterruptConfig(&LIS3DSH_IntConfigStruct);
 
 	while (1){
 	}

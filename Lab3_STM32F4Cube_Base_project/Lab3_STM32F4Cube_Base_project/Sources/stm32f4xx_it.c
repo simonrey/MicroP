@@ -273,7 +273,19 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 /*void PPP_IRQHandler(void)
 {
 }*/
+void EXTI0_IRQHandler(void) //HAL_GPIO_EXTI_IRQHandler
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+	
+}
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	printf("callback from accellerometer interrupt \n");
+	float acceleration[3];
+	LIS3DSH_ReadACC(&acceleration);
+	printf("Acceleration: %f,%f,%f \n",acceleration[0],acceleration[1],acceleration[2]);
+}
 /**
   * @}
   */ 
