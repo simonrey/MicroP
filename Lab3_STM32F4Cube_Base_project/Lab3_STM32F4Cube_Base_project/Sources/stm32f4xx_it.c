@@ -59,7 +59,6 @@ uint16_t row;
 uint16_t col;
 int timeExpired = 0;
 
-extern TIM_HandleTypeDef tim_handle;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -166,6 +165,7 @@ void SysTick_Handler(void)
 }
 
 void TIM2_IRQHandler(){
+	interruptResetTimer();
 	timeExpired = 1;
 }
 
@@ -173,7 +173,7 @@ void EXTI9_5_IRQHandler(){
 
 	//Row determination
 	if(keyPressed == 0){
-		HAL_TIM_Base_Start(&tim_handle);
+		startResetTimer();
 		row = 3;
 		keyPressed++;
 		initializeGPIO(keyPressed);
@@ -190,6 +190,7 @@ void EXTI9_5_IRQHandler(){
 
 void EXTI4_IRQHandler(){
 
+	stopResetTimer();
 	//Row determination
 	if(keyPressed == 0){
 		row = 2;
@@ -208,6 +209,7 @@ void EXTI4_IRQHandler(){
 
 void EXTI3_IRQHandler(){
 
+	stopResetTimer();
 	//Row determination
 	if(keyPressed == 0){
 		row = 1;
@@ -239,7 +241,7 @@ void EXTI3_IRQHandler(){
 			initializePitchRoll(timeExpired);
 			timeExpired = 0;
 			keyPressed = 0;
-			HAL_TIM_Base_Stop(&tim_handle);
+			stopResetTimer();
 			HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
 		}
 		else{

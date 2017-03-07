@@ -59,7 +59,10 @@ void initializeGPIO(int keyPressed);
 void getKeyPressed(int row, int col);
 void initializePitchRoll(int reInit);
 void deInitPitchRoll(void);
-void initializeResetTimer(void)
+void initializeResetTimer(void);
+void startResetTimer(void);
+void stopResetTimer(void);
+void interruptResetTimer(void);
 	 
 	 
 /* USER CODE END Prototypes */

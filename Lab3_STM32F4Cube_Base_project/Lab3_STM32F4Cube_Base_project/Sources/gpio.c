@@ -40,6 +40,8 @@ int digitCount;
 int * pitch;
 int * roll;
 
+TIM_HandleTypeDef tim_handle;
+
 /* USER CODE END 0 */
 
 /*----------------------------------------------------------------------------*/
@@ -47,7 +49,7 @@ int * roll;
 /*----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
 
-void InitializeGPIO(int keyPressed){
+void initializeGPIO(int keyPressed){
 	
 	__HAL_RCC_GPIOE_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
@@ -136,18 +138,33 @@ void InitializeGPIO(int keyPressed){
 }
 
 void initializeResetTimer(void){
-	RCC_APB1ENR_TIM2EN;
+		
+	__TIM2_CLK_ENABLE();
 
-	TIM_HandleTypeDef tim_handle;
 	tim_handle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	tim_handle.Init.CounterMode = TIM_COUNTERMODE_UP;
-	tim_handle.Init.Period = 1;
-	tim_handle.Init.Prescaler = 0;
+	tim_handle.Init.Period = 665;
+	tim_handle.Init.Prescaler = (42000-1);
+	tim_handle.Instance = TIM2;
 	
-	HAL_TIM_Base_MspInit(&tim_handle);
-	__TIM2_CLK_ENABLE();
 	HAL_TIM_Base_Init(&tim_handle);
-			
+
+	HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(TIM2_IRQn);
+	
+}
+
+void interruptResetTimer(){
+	HAL_TIM_IRQHandler(&tim_handle);
+}
+
+void startResetTimer(void){
+	HAL_TIM_Base_Start_IT(&tim_handle);
+}
+void stopResetTimer(void){
+	HAL_TIM_Base_Stop(&tim_handle);
+	HAL_TIM_Base_DeInit(&tim_handle);
+	initializeResetTimer();
 }
 
 void initializePitchRoll(int reInit){
