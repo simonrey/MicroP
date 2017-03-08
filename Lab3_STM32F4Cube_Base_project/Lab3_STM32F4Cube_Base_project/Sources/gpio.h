@@ -55,7 +55,8 @@ void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 	 
-void initializeGPIO(int keyPressed);
+void initializeGPIO(void);
+void reInitializeGPIO(int GPIO_PIN);
 void getKeyPressed(int row, int col);
 void initializePitchRoll(int reInit);
 void deInitPitchRoll(void);
@@ -63,6 +64,8 @@ void initializeResetTimer(void);
 void startResetTimer(void);
 void stopResetTimer(void);
 void interruptResetTimer(void);
+void printPitch(void);
+void disableIRQ(void);
 	 
 	 
 /* USER CODE END Prototypes */

@@ -170,73 +170,71 @@ void TIM2_IRQHandler(){
 }
 
 void EXTI9_5_IRQHandler(){
-
+	disableIRQ();
 	//Row determination
 	if(keyPressed == 0){
-		startResetTimer();
+		//startResetTimer();
 		row = 3;
 		keyPressed++;
-		initializeGPIO(keyPressed);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
 	}
-	//Column determination
-	if(keyPressed == 1){
+	//Column Determination
+	else if(keyPressed == 1){
 		col = 3;
 		keyPressed++;
-		initializeGPIO(0*keyPressed);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
 	}
 }
 
 void EXTI4_IRQHandler(){
-
+	disableIRQ();
 	stopResetTimer();
+	
 	//Row determination
 	if(keyPressed == 0){
 		row = 2;
 		keyPressed++;
-		initializeGPIO(keyPressed);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
 	}
-	//Column determination
-	if(keyPressed == 1){
+	
+	//Column Determination
+	else if(keyPressed == 1){
 		col = 2;
 		keyPressed++;
-		initializeGPIO(0*keyPressed);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
 	}
 }
 
 void EXTI3_IRQHandler(){
 
+	disableIRQ();
 	stopResetTimer();
+	
 	//Row determination
 	if(keyPressed == 0){
 		row = 1;
 		keyPressed++;
-		initializeGPIO(keyPressed);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
 	}
-	//Column determination
-	if(keyPressed == 1){
+	
+	//Column Determinuation
+	else if(keyPressed == 1){
 		col = 1;
 		keyPressed++;
-		initializeGPIO(0*keyPressed);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
 	}
 }
 	
 	void EXTI2_IRQHandler(){
-
+	disableIRQ();
 	//Row determination
-	if(keyPressed == 0){
+	if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_2)){
 		row = 0;
 		keyPressed++;
-		initializeGPIO(keyPressed);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
 	}
-	//Column determination
-	if(keyPressed == 1){
+	//Column Determination
+	else if(!HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2)){
 		if(timeExpired && (row == 3)){
 			initializePitchRoll(timeExpired);
 			timeExpired = 0;
@@ -247,17 +245,24 @@ void EXTI3_IRQHandler(){
 		else{
 			col = 0;
 			keyPressed++;
-			initializeGPIO(0*keyPressed);
 			HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
 		}
 	}
+	
 }
 
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	
 	if(keyPressed>1){
+		//col = GPIO_Pin - 4;
 		getKeyPressed(row, col);
 		keyPressed = 0;
+		initializeGPIO();
+	}
+	else{
+		//row = GPIO_Pin - 4;
+		reInitializeGPIO(GPIO_Pin);
 	}
 }
 
@@ -281,13 +286,13 @@ void EXTI0_IRQHandler(void) //HAL_GPIO_EXTI_IRQHandler
 	
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	printf("callback from accellerometer interrupt \n");
-	float acceleration[3];
-	LIS3DSH_ReadACC(&acceleration);
-	printf("Acceleration: %f,%f,%f \n",acceleration[0],acceleration[1],acceleration[2]);
-}
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//{
+//	printf("callback from accellerometer interrupt \n");
+//	float acceleration[3];
+//	LIS3DSH_ReadACC(&acceleration);
+//	printf("Acceleration: %f,%f,%f \n",acceleration[0],acceleration[1],acceleration[2]);
+//}
 /**
   * @}
   */ 

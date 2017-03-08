@@ -36,11 +36,12 @@
 #include "gpio.h"
 #include <stdlib.h>
 /* USER CODE BEGIN 0 */
-int digitCount;
-int * pitch;
-int * roll;
+int digitCount = 0;
+int pitch[3]={1,2,3};
+int roll[3];
 
 TIM_HandleTypeDef tim_handle;
+GPIO_InitTypeDef init_gpio;
 
 /* USER CODE END 0 */
 
@@ -49,13 +50,12 @@ TIM_HandleTypeDef tim_handle;
 /*----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
 
-void initializeGPIO(int keyPressed){
+void initializeGPIO(){
 	
-	__HAL_RCC_GPIOE_CLK_ENABLE();
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-	__HAL_RCC_GPIOD_CLK_ENABLE();
+	HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI4_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI3_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI2_IRQn);
 	
 	HAL_GPIO_DeInit(GPIOA,GPIO_PIN_5);
 	HAL_GPIO_DeInit(GPIOB,GPIO_PIN_4);
@@ -63,79 +63,204 @@ void initializeGPIO(int keyPressed){
 	HAL_GPIO_DeInit(GPIOD,GPIO_PIN_2);
 	HAL_GPIO_DeInit(GPIOE,(GPIO_PIN_5|GPIO_PIN_4|GPIO_PIN_3|GPIO_PIN_2));
 	
-	GPIO_InitTypeDef init_gpio;
+
 	
+	//Mapping
+	//B8 - PA5
+	//B7 - PB4
+	//B6 - PC3
+	//B5 - PD2
+	//B4 - PE5
+	//B3 - PE4
+	//B2 - PE3
+	//B1 - PE2
 	
-	//PA5 - Set as input/output
+	//PA5 - Set as input
 	init_gpio.Pin = (GPIO_PIN_5);
-	init_gpio.Mode = keyPressed ? GPIO_MODE_IT_FALLING : GPIO_MODE_OUTPUT_PP;
-	init_gpio.Pull = keyPressed ? GPIO_PULLUP : GPIO_PULLDOWN;
-	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	init_gpio.Mode = GPIO_MODE_IT_FALLING;
+	init_gpio.Pull = GPIO_PULLUP;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOA, &init_gpio);
-	
-	//PE5 - Set as output/input
-	init_gpio.Pin = (GPIO_PIN_5);
-	init_gpio.Mode = keyPressed ? GPIO_MODE_OUTPUT_PP : GPIO_MODE_IT_RISING;
-	init_gpio.Pull = keyPressed ? GPIO_PULLDOWN : GPIO_PULLUP;
-	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
-	HAL_GPIO_Init(GPIOE, &init_gpio);
 		
-	//PB4 - Set as input/output
+	//PB4 - Set as input
 	init_gpio.Pin = (GPIO_PIN_4);
-	init_gpio.Mode = keyPressed ? GPIO_MODE_IT_FALLING : GPIO_MODE_OUTPUT_PP;
-	init_gpio.Pull = keyPressed ? GPIO_PULLUP : GPIO_PULLDOWN;
-	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	init_gpio.Mode =GPIO_MODE_IT_FALLING;
+	init_gpio.Pull = GPIO_PULLUP;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOB, &init_gpio);
-		
-	//PE4 - Set as output/input
-	init_gpio.Pin = (GPIO_PIN_4);
-	init_gpio.Mode = keyPressed ? GPIO_MODE_OUTPUT_PP : GPIO_MODE_IT_RISING;
-	init_gpio.Pull = keyPressed ? GPIO_PULLDOWN : GPIO_PULLUP;
-	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
-	HAL_GPIO_Init(GPIOE, &init_gpio);
 	
-	//PC3 - Set as input/output
+	//PC3 - Set as input
 	init_gpio.Pin = (GPIO_PIN_3);
-	init_gpio.Mode = keyPressed ? GPIO_MODE_IT_FALLING : GPIO_MODE_OUTPUT_PP;
-	init_gpio.Pull = keyPressed ? GPIO_PULLUP : GPIO_PULLDOWN;
-	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	init_gpio.Mode = GPIO_MODE_IT_FALLING;
+	init_gpio.Pull = GPIO_PULLUP;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOC, &init_gpio);
-	
-	//PE3 - Set as output/input
-	init_gpio.Pin = (GPIO_PIN_3);
-	init_gpio.Mode = keyPressed ? GPIO_MODE_OUTPUT_PP : GPIO_MODE_IT_RISING;
-	init_gpio.Pull = keyPressed ? GPIO_PULLDOWN : GPIO_PULLUP;
-	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
-	HAL_GPIO_Init(GPIOE, &init_gpio);
-		
-	//PD2 - Set as input/output
+
+	//PD2 - Set as input
 	init_gpio.Pin = (GPIO_PIN_2);
-	init_gpio.Mode = keyPressed ? GPIO_MODE_IT_FALLING : GPIO_MODE_OUTPUT_PP;
-	init_gpio.Pull = keyPressed ? GPIO_PULLUP : GPIO_PULLDOWN;
-	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	init_gpio.Mode = GPIO_MODE_IT_FALLING;
+	init_gpio.Pull = GPIO_PULLUP;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOD, &init_gpio);
-		
-	//PE2 - Set as output/input
-	init_gpio.Pin = (GPIO_PIN_2);
-	init_gpio.Mode = keyPressed ? GPIO_MODE_OUTPUT_PP : GPIO_MODE_IT_RISING;
-	init_gpio.Pull = keyPressed ? GPIO_PULLDOWN : GPIO_PULLUP;
-	init_gpio.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	
+	//PE5 - Set as output
+	init_gpio.Pin = (GPIO_PIN_5);
+	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
+	init_gpio.Pull = GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOE, &init_gpio);
+	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,GPIO_PIN_RESET);
+
+	//PE4 - Set as output
+	init_gpio.Pin = (GPIO_PIN_4);
+	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
+	init_gpio.Pull = GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_RESET);
 	
-	
-	HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+	//PE3 - Set as output
+	init_gpio.Pin = (GPIO_PIN_3);
+	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
+	init_gpio.Pull = GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+
+	//PE2 - Set as output
+	init_gpio.Pin = (GPIO_PIN_2);
+	init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
+	init_gpio.Pull = GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET);
+
+	HAL_NVIC_SetPriority(EXTI9_5_IRQn, 8, 8);
 	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 	
-	HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(EXTI4_IRQn, 8, 8);
 	HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 	
-	HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(EXTI3_IRQn, 8, 8);
 	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 	
-	HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(EXTI2_IRQn, 8, 8);
 	HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 	
 }
+
+void reInitializeGPIO(int GPIO_PIN){
+	
+	HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI4_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI3_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+
+	HAL_GPIO_DeInit(GPIOA,GPIO_PIN_5);
+	HAL_GPIO_DeInit(GPIOB,GPIO_PIN_4);
+	HAL_GPIO_DeInit(GPIOC,GPIO_PIN_3);
+	HAL_GPIO_DeInit(GPIOD,GPIO_PIN_2);
+	HAL_GPIO_DeInit(GPIOE,(GPIO_PIN_5|GPIO_PIN_4|GPIO_PIN_3|GPIO_PIN_2));
+	
+	//Mapping
+	//B8 - PA5
+	//B7 - PB4
+	//B6 - PC3
+	//B5 - PD2
+	//B4 - PE5
+	//B3 - PE4
+	//B2 - PE3
+	//B1 - PE2
+	
+	//Set what was the input to an output high
+	switch (GPIO_PIN){
+		case GPIO_PIN_5 :
+			HAL_GPIO_DeInit(GPIOA,GPIO_PIN_5);
+			init_gpio.Pin = GPIO_PIN_5;
+			init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
+			init_gpio.Pull = GPIO_PULLUP;
+			init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+			HAL_GPIO_Init(GPIOA,&init_gpio);
+			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
+			break;
+		case GPIO_PIN_4 :
+			HAL_GPIO_DeInit(GPIOB,GPIO_PIN_4);
+			init_gpio.Pin = GPIO_PIN_4;
+			init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
+			init_gpio.Pull = GPIO_PULLUP;
+			init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+			HAL_GPIO_Init(GPIOB,&init_gpio);
+			HAL_GPIO_WritePin(GPIOB,GPIO_PIN_4,GPIO_PIN_SET);
+			break;
+		case GPIO_PIN_3 :
+			HAL_GPIO_DeInit(GPIOC,GPIO_PIN_3);
+			init_gpio.Pin = GPIO_PIN_3;
+			init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
+			init_gpio.Pull = GPIO_PULLUP;
+			init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+			HAL_GPIO_Init(GPIOC,&init_gpio);
+			HAL_GPIO_WritePin(GPIOC,GPIO_PIN_3,GPIO_PIN_SET);
+			break;
+		case GPIO_PIN_2 :
+			HAL_GPIO_DeInit(GPIOD,GPIO_PIN_2);
+			init_gpio.Pin = GPIO_PIN_2;
+			init_gpio.Mode = GPIO_MODE_OUTPUT_PP;
+			init_gpio.Pull = GPIO_PULLUP;
+			init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+			HAL_GPIO_Init(GPIOD,&init_gpio);
+			HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,GPIO_PIN_SET);
+			break;
+	}
+	
+	//PE5 - Set as input
+	init_gpio.Pin = (GPIO_PIN_5);
+	init_gpio.Mode = GPIO_MODE_IT_RISING;
+	init_gpio.Pull = GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+
+	//PE4 - Set as output/input
+	init_gpio.Pin = (GPIO_PIN_4);
+	init_gpio.Mode = GPIO_MODE_IT_RISING;
+	init_gpio.Pull = GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+	
+	//PE3 - Set as output/input
+	init_gpio.Pin = (GPIO_PIN_3);
+	init_gpio.Mode = GPIO_MODE_IT_RISING;
+	init_gpio.Pull = GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+
+	//PE2 - Set as output/input
+	init_gpio.Pin = (GPIO_PIN_2);
+	init_gpio.Mode = GPIO_MODE_IT_RISING;
+	init_gpio.Pull = GPIO_PULLDOWN;
+	init_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOE, &init_gpio);
+
+	HAL_NVIC_SetPriority(EXTI9_5_IRQn, 8, 8);
+	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+	
+	HAL_NVIC_SetPriority(EXTI4_IRQn, 8, 8);
+	HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+	
+	HAL_NVIC_SetPriority(EXTI3_IRQn, 8, 8);
+	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+	
+	HAL_NVIC_SetPriority(EXTI2_IRQn, 8, 8);
+	HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+	
+}
+
+void disableIRQ(void){
+	HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI4_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI3_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+}
+
 
 void initializeResetTimer(void){
 		
@@ -173,8 +298,8 @@ void initializePitchRoll(int reInit){
 		deInitPitchRoll();
 	}
 	
-	pitch = malloc(3*sizeof(int));
-	roll = malloc(3*sizeof(int));
+//	pitch = malloc(3*sizeof(int));
+//	roll = malloc(3*sizeof(int));
 	digitCount = 0;
 }
 
@@ -185,25 +310,55 @@ void deInitPitchRoll(){
 
 void getKeyPressed(int row, int col){
 	
-	int key = row*3+col;
+	int key = row*4+col;
 	switch(key){
+		case 0 :
+			key = 1;
+			break;
+		case 1 :
+			key = 2;
+			break;
+		case 2:
+			key = 3;
+			break;
 		case 3 :
 			key = 10;
+			break;
+		case 4:
+			key = 4;
+			break;
+		case 5:
+			key = 5;
+			break;
+		case 6:
+			key = 6;
 			break;
 		case 7 :
 			key = 11;
 			break;
+		case 8 :
+			key = 7;
+			break;
+		case 9 :
+			key = 8;
+			break;
+		case 10 :
+			key = 9;
+			break;
 		case 11 :
 			key = 12;
-			break;
-		case 15 :
-			key = 13;
 			break;
 		case 12 :
 			key = -1;
 			break;
+		case 13 :
+			key = 0;
+			break;
 		case 14 :
 			key = -2;
+			break;
+		case 15 :
+			key = 13;
 			break;
 	}
 	
@@ -223,6 +378,7 @@ void getKeyPressed(int row, int col){
 	if(digitCount<3){
 		if(key == -2){
 			digitCount = 3;
+			printPitch();
 		}
 		if(key == -1){
 			digitCount--;
@@ -231,9 +387,14 @@ void getKeyPressed(int row, int col){
 			pitch[digitCount] = key;
 			digitCount++;
 		}
-	}	
+	}
+	
 }
 
+void printPitch(){
+	
+	printf("P[0] = %i\nP[1] = %i\nP[2] = %i\n", pitch[0], pitch[1], pitch[2]);
+}
 
 
 /* USER CODE END 1 */
