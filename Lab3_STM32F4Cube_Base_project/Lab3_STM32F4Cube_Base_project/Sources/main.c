@@ -34,10 +34,9 @@ int main(void)
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
-	
-
+		
 	initializeResetTimer();
-	initializeGPIO();
+	initializeGPIO(1);
 	initializePitchRoll(0);
 	
 	

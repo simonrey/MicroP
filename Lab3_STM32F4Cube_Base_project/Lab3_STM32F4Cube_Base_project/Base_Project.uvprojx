@@ -554,6 +554,31 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Headers</GroupName>
+          <Files>
+            <File>
+              <FileName>gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\gpio.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\stm32f4xx_it.h</FilePath>
+            </File>
+            <File>
+              <FileName>supporting_functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\supporting_functions.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>

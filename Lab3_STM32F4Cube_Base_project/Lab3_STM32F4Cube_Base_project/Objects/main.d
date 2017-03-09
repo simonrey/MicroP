@@ -42,4 +42,4 @@
 .\objects\main.o: C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.8.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_usart.h
 .\objects\main.o: .\Headers\supporting_functions.h
 .\objects\main.o: .\Accelerometer\inc\lis3dsh.h
-.\objects\main.o: Sources\gpio.h
+.\objects\main.o: .\Headers\gpio.h

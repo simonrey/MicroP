@@ -58,6 +58,8 @@ int keyPressed = 0;
 uint16_t row;
 uint16_t col;
 int timeExpired = 0;
+int rowCaptured = 0;
+int colCaptured = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -170,100 +172,151 @@ void TIM2_IRQHandler(){
 }
 
 void EXTI9_5_IRQHandler(){
-	disableIRQ();
+	startResetTimer();
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
+
+	
+	
+//	if(rowCaptured == 1 && colCaptured == 0){
+//		col = 3;
+//		colCaptured = 1;
+//	}	
+//	if(rowCaptured == 0 && colCaptured == 0){
+//		row = 3;
+//		rowCaptured = 1;
+//	}
+	
+	
 	//Row determination
-	if(keyPressed == 0){
-		//startResetTimer();
-		row = 3;
-		keyPressed++;
-		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
-	}
-	//Column Determination
-	else if(keyPressed == 1){
-		col = 3;
-		keyPressed++;
-		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
-	}
+//	if(keyPressed == 0){
+//		//startResetTimer();
+//		row = 3;
+//		keyPressed++;
+//		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
+//	}
+//	//Column Determination
+//	else if(keyPressed == 1){
+//		col = 3;
+//		keyPressed++;
+//		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
+//	}
 }
 
 void EXTI4_IRQHandler(){
-	disableIRQ();
-	stopResetTimer();
+	
+//	if(rowCaptured == 1 && colCaptured == 0){
+//		col = 2;
+//		colCaptured = 1;
+//	}
+//	if(rowCaptured == 0 && colCaptured == 0){
+//		row = 2;
+//		rowCaptured = 1;
+//	}
+	
+	
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+	
+	
+	
+	//stopResetTimer();
 	
 	//Row determination
-	if(keyPressed == 0){
-		row = 2;
-		keyPressed++;
-		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
-	}
-	
-	//Column Determination
-	else if(keyPressed == 1){
-		col = 2;
-		keyPressed++;
-		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
-	}
+//	if(keyPressed == 0){
+//		row = 2;
+//		keyPressed++;
+//		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+//	}
+//	
+//	//Column Determination
+//	else if(keyPressed == 1){
+//		col = 2;
+//		keyPressed++;
+//		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+//	}
 }
 
 void EXTI3_IRQHandler(){
-
-	disableIRQ();
-	stopResetTimer();
+	
+//	if(rowCaptured == 1 && colCaptured == 0){
+//		col = 1;
+//		colCaptured = 1;
+//	}
+//	if(rowCaptured == 0 && colCaptured == 0){
+//		row = 1;
+//		rowCaptured = 1;
+//	}
+//	
+	
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+	
+	//stopResetTimer();
 	
 	//Row determination
-	if(keyPressed == 0){
-		row = 1;
-		keyPressed++;
-		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
-	}
-	
-	//Column Determinuation
-	else if(keyPressed == 1){
-		col = 1;
-		keyPressed++;
-		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
-	}
+//	if(keyPressed == 0){
+//		row = 1;
+//		keyPressed++;
+//		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+//	}
+//	
+//	//Column Determinuation
+//	else if(keyPressed == 1){
+//		col = 1;
+//		keyPressed++;
+//		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+//	}
 }
 	
-	void EXTI2_IRQHandler(){
-	disableIRQ();
+void EXTI2_IRQHandler(){
+
+//	if(rowCaptured == 1 && colCaptured == 0){
+//		col = 0;
+//		colCaptured = 1;
+//	}
+//	if(rowCaptured == 0 && colCaptured == 0){
+//		row = 0;
+//		rowCaptured = 1;
+//	}
+//		
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+	
 	//Row determination
-	if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_2)){
-		row = 0;
-		keyPressed++;
-		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
-	}
-	//Column Determination
-	else if(!HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2)){
-		if(timeExpired && (row == 3)){
-			initializePitchRoll(timeExpired);
-			timeExpired = 0;
-			keyPressed = 0;
-			stopResetTimer();
-			HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
-		}
-		else{
-			col = 0;
-			keyPressed++;
-			HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
-		}
-	}
+//	if(keyPressed == 0){
+//		row = 0;
+//		keyPressed++;
+//		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+//	}
+//	//Column Determination
+//	else if(keyPressed == 1){
+//		if(timeExpired && (row == 3)){
+//			initializePitchRoll(timeExpired);
+//			timeExpired = 0;
+//			keyPressed = 0;
+//			stopResetTimer();
+//			HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+//		}
+//		else{
+//			col = 0;
+//			keyPressed++;
+//			HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+//		}
+//	}
 	
 }
 
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	
-	if(keyPressed>1){
-		//col = GPIO_Pin - 4;
-		getKeyPressed(row, col);
-		keyPressed = 0;
-		initializeGPIO();
-	}
-	else{
-		//row = GPIO_Pin - 4;
-		reInitializeGPIO(GPIO_Pin);
-	}
+	getKey(GPIO_Pin);
+	
+//	if(rowCaptured && colCaptured){
+//		getKeyPressed(row, col);
+//		rowCaptured = 0;
+//		colCaptured = 0;
+//		initializeGPIO(0);
+//	}
+//	else{
+//		reInitializeGPIO();
+//	}
 }
 
 /******************************************************************************/

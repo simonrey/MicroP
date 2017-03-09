@@ -35,12 +35,24 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __gpio_H
 #define __gpio_H
+
+#define row0 GPIO_PIN_2
+#define row1 GPIO_PIN_3
+#define row2 GPIO_PIN_4
+#define row3 GPIO_PIN_5
+
+#define col0 GPIO_PIN_2
+#define col1 GPIO_PIN_3
+#define col2 GPIO_PIN_4
+#define col3 GPIO_PIN_5
+
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+
 
 /* USER CODE BEGIN Includes */
 
@@ -53,7 +65,25 @@
 void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+	 
+void initializeGPIO(int initialSetup);
+void getKey(int pin);
+void enableInterrupts(void);
+void disableInterrupts(void);
+	 
+	 
+void reInitializeGPIO(void);
+int interruptIsDisabled(void);
+void getKeyPressed(int row, int col);
+void initializePitchRoll(int reInit);
+void deInitPitchRoll(void);
+void initializeResetTimer(void);
+void startResetTimer(void);
+void stopResetTimer(void);
+void interruptResetTimer(void);
+void printPitch(void);
+	 
+	 
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
