@@ -403,6 +403,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\threads.c</FilePath>
             </File>
+            <File>
+              <FileName>interrupts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\interrupts.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -437,6 +442,16 @@
               <FileName>threads.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\threads.h</FilePath>
+            </File>
+            <File>
+              <FileName>interrupts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\interrupts.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\main.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -847,6 +862,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\threads.c</FilePath>
             </File>
+            <File>
+              <FileName>interrupts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\interrupts.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -881,6 +901,16 @@
               <FileName>threads.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\threads.h</FilePath>
+            </File>
+            <File>
+              <FileName>interrupts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\interrupts.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\main.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1289,6 +1319,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\threads.c</FilePath>
             </File>
+            <File>
+              <FileName>interrupts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\interrupts.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1323,6 +1358,16 @@
               <FileName>threads.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\threads.h</FilePath>
+            </File>
+            <File>
+              <FileName>interrupts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\interrupts.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\main.h</FilePath>
             </File>
           </Files>
         </Group>

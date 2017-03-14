@@ -20,6 +20,16 @@ extern void start_Thread_LED			(void);
 extern void Thread_LED(void const *argument);
 extern osThreadId tid_Thread_LED;
 
+uint32_t readingADC[1];
+float currentTemp;
+	
+	
+GPIO_InitTypeDef keypadGPIO;
+GPIO_InitTypeDef displayGPIO;
+ADC_HandleTypeDef handleADC;
+ADC_ChannelConfTypeDef channelADC;
+DMA_HandleTypeDef handleDMA;
+
 /**
 	These lines are mandatory to make CMSIS-RTOS RTX work with te new Cube HAL
 */
@@ -67,14 +77,34 @@ void SystemClock_Config(void) {
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
 }
 
-/**
-  * Main function
-  */
-int main (void) {
 
-	GPIO_InitTypeDef keypadGPIO;
-	GPIO_InitTypeDef displayGPIO;
-	ADC_HandleTypeDef handleADC;
+uint32_t getReadingADC(void){
+	return readingADC[0]; 
+}
+uint32_t * getReadingADCLocation(void){
+	return readingADC;
+}
+
+
+float getCurrentTemp(void){
+	return currentTemp;
+}
+void setCurrentTemp(float t){
+	currentTemp = t;
+}
+
+ADC_HandleTypeDef * getHandleADC(void){
+	return &handleADC;
+}
+DMA_HandleTypeDef * getHandleDMA(void){
+	return &handleDMA;
+}
+ADC_ChannelConfTypeDef * getHandleADCChannel(void){
+	return &channelADC;
+}
+
+
+int main (void){
 	
 	osThreadId tempThread;
 	osThreadId accelThread;
@@ -88,7 +118,13 @@ int main (void) {
 	enableClockGPIO();
 	initDisplayGPIO(&displayGPIO);
 	initKeypadGPIO_1(&keypadGPIO);
-	initADC(&handleADC);
+	
+	/*
+	Temperature stuff starts on the initialization of the ADC
+	startTempThread() takes the tempThreadId and returns it again so main could use it in the parent thread
+	if necessary. The temperature stuff should work this way however the GPIO pins need to be set right.
+	*/
+	//initADC(&handleADC,&channelADC,&handleDMA,readingADC);
 	
 	tempThread = startTempThread(tempThread);
 	accelThread = startAccelThread(accelThread);
@@ -99,4 +135,6 @@ int main (void) {
 	/* User codes ends here*/
   
 	osKernelStart();                          /* start thread execution         */
+	
+	return 0;
 }

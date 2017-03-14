@@ -10,6 +10,12 @@
 	
 #include "cmsis_os.h"                   // ARM::CMSIS:RTOS:Keil RTX
 #include "stm32f4xx_hal.h"
+#include "main.h"
+#include "gpio.h"
+#include "adc.h"
+
+void tempThread(void const *argument);
+osThreadDef(tempThread, osPriorityNormal, 1, 0);
 
 void Thread_LED (void const *argument);                 // thread function
 osThreadId tid_Thread_LED;                              // thread id
@@ -53,13 +59,13 @@ int start_Thread_LED (void) {
  *    Temperature Thread Context creation  
  *---------------------------------------------------------------------------*/
 osThreadId startTempThread(osThreadId tempThreadID){
-	tempThreadID = osThreadCreate(osThread(tempThread), NULL);
+	tempThreadID = osThreadCreate(osThread(tempThread ), NULL);
 	if(!tempThreadID) return NULL;
 	else return(tempThreadID);
 }
 /*----------------------------------------------------------------------------
  *    Temperature thread content 
  *---------------------------------------------------------------------------*/
-void tempThread(void){
-	
+void tempThread(void const *argument){
+	initADC(getHandleADC(),getHandleADCChannel(),getHandleDMA(),getReadingADCLocation());
 }

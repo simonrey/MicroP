@@ -3,12 +3,24 @@
 #include "gpio.h"
 #include <stdlib.h>
 #include <math.h>
+#include "main.h"
+
+
+int currentDigit = 0;
+int currentDisplayTemp = 0;
+
+float rawTemp;
+float pastTemperatures[50];
+static const float coeffsArray[51] = {0.000950456065525981, 0.0032982880300802, 0.00449132702555116, -0.00147679039173661, -0.0173486722707884, -0.0322288371748662, -0.020649059911765, 0.0395767340724028, 0.141361472999714, 0.24066169296412, 0.282151127183525, 0.24066169296412, 0.141361472999714, 0.0395767340724028, -0.020649059911765, -0.0322288371748662, -0.0173486722707884, -0.00147679039173661, 0.00449132702555116, 0.0032982880300802, 0.000950456065525981};
+int pastTemperaturesIndex = 0;
+
+
 
 void enableClockGPIO(void){
 	//Enable GPIO clocks here
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
-	
+
 }
 
 void initKeypadGPIO_1(GPIO_InitTypeDef * gpioInitType){
@@ -54,7 +66,7 @@ void initKeypadGPIO_1(GPIO_InitTypeDef * gpioInitType){
 	gpioInitType->Pull = GPIO_PULLDOWN;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOE, gpioInitType);
-	HAL_GPIO_WritePin(GPIOE,(col0 | col1 | col2 | col3),GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE,(COL0 | COL1 | COL2 | COL3),GPIO_PIN_RESET);
 }
 
 void initKeypadGPIO_2(GPIO_InitTypeDef * gpioInitType){
@@ -127,6 +139,57 @@ void initializeDisplayGPIO(GPIO_InitTypeDef * gpioInitType){
 
 //Segmennt Display Functions here
 
+int getCurrentDisplayTemp(void){
+	return currentDisplayTemp;
+}
+void setCurrentDisplayTemp(int newCurrentDisplayTemp){
+	currentDisplayTemp = newCurrentDisplayTemp;
+}
+
+
+void filter(void){
+			pastTemperatures[pastTemperaturesIndex] = getRawTemp();
+			pastTemperaturesIndex++;
+			if(pastTemperaturesIndex > 50)
+			{
+				pastTemperaturesIndex = 0;
+			}
+			float scratchTemp = 0;
+			for(int i = pastTemperaturesIndex; i < 51; i++)
+			{
+				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArray[i - pastTemperaturesIndex];
+			}
+			
+			for(int i = 0; i < pastTemperaturesIndex; i++)
+			{
+				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArray[i + (51 - pastTemperaturesIndex)];
+			}
+			setCurrentTemp(scratchTemp);
+}
+
+
+int updateDigit(int temperature, int digit){
+	int s[8] = {0};
+	int digitValue = (int)(temperature/(pow((double)10,(double)(digit)))) % 10; //isolates the digit to be updated of the temperature
+	
+	resetDigitSelectLines(); //sets all select lines to zero so that only one digit is on at a time
+	SegmentEncoder(digitValue, s, digit);
+	setDigitSelectLines(digit);
+	
+	return 0;
+}
+float getRawTemp(void){
+	return rawTemp;
+}
+void setRawTemp(float t){
+	rawTemp = t;
+}
+int getCurrentDigit(void){
+	return currentDigit;
+}
+void setCurrentDigit(int newCurrentDigit){
+	currentDigit = newCurrentDigit;
+}
 int SegmentEncoder(int toDecode, int * segArr, int digit){
 	
 	int isNegative = 0;
@@ -240,29 +303,40 @@ int SegmentEncoder(int toDecode, int * segArr, int digit){
 		return isNegative;
 }
 
+void setSegmentSelectLines(int * segmentArray){
+	for(int i = 0 ; i < 7 ; i++){
+		if(segmentArray[i]) HAL_GPIO_WritePin(GPIOE, segments[i], GPIO_PIN_SET);
+		else HAL_GPIO_WritePin(GPIOE,segments[i], GPIO_PIN_RESET);
+	}
+}
+
 void resetDigitSelectLines(void){
 	HAL_GPIO_WritePin(GPIOE, DIGIT_CONTROL_1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOE, DIGIT_CONTROL_2, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOE, DIGIT_CONTROL_3, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOE, DIGIT_CONTROL_4, GPIO_PIN_RESET);
 }
-void resetSegmentSelectLines(void){
-	HAL_GPIO_WritePin(GPIOE, SEG0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, SEG1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, SEG2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, SEG3, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, SEG4, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, SEG5, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, SEG6, GPIO_PIN_RESET);
-	
-}
-void setSegmentSelectLines(int * segmentArray){
-	for(int i = 0 ; i < 7 ; i++){
-		if(segmentArray[i]) HAL_GPIO_WritePin(GPIOE, segments[i], GPIO_PIN_SET);
+void setDigitSelectLines(int digit){
+	//sets the appropriate digit select line high
+	switch(digit)
+	{
+		case 0:
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);		
+			break;
+		case 1:
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, GPIO_PIN_SET); 
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);
+			break;
+		case 2:
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);		
+			break;
+		case 3:
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_SET); 
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);
+			break;
 	}
-}
-void setDigitSelectLine(int digit){
-	HAL_GPIO_WritePin(GPIOE, pow(digit,2), GPIO_PIN_SET);
 }
 
 //Keypad Functions here

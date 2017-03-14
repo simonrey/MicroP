@@ -22,52 +22,87 @@ Dialog DLL:      TCM.DLL V1.27.0.0
  
 <h2>Project:</h2>
 C:\Users\simon\Documents\MicroP\Lab4_STM32F4Cube_Base_project\Blinky.uvprojx
-Project File Date:  03/12/2017
+Project File Date:  03/14/2017
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
-Build target 'Lab4'
-compiling threads.c...
-Sources\threads.c(56): error:  #20: identifier "os_thread_def_tempThread" is undefined
-  	tempThreadID = osThreadCreate(
-sThread(tempThread), NULL);
-Sources\threads.c(65): warning:  #1-D: last line of file ends without a newline
-  }
-Sources\threads.c: 1 warning, 1 error
-compiling gpio.c...
-.\Headers\gpio.h(59): warning:  #1-D: last line of file ends without a newline
+Rebuild target 'Lab4'
+compiling supporting_functions.c...
+compiling adc.c...
+compiling main.c...
+.\Headers\gpio.h(71): warning:  #1-D: last line of file ends without a newline
   #endif /*__ pinoutConfig_H */
-Sources\gpio.c(24): error:  #29: expected an expression
-  	gpioInitType->Pin = 
-OW0;
-Sources\gpio.c(31): error:  #29: expected an expression
-  	gpioInitType->Pin = 
-OW1;
-Sources\gpio.c(38): error:  #29: expected an expression
-  	gpioInitType->Pin = 
-OW2;
-Sources\gpio.c(45): error:  #29: expected an expression
-  	gpioInitType->Pin = 
-OW3;
-Sources\gpio.c(52): error:  #29: expected an expression
-  	gpioInitType->Pin = 
-OL0 | COL1 | COL2| COL3;
-Sources\gpio.c(57): error:  #20: identifier "col0" is undefined
-  	HAL_GPIO_WritePin(
-PIOE,(col0 | col1 | col2 | col3),GPIO_PIN_RESET);
-Sources\gpio.c(57): error:  #20: identifier "col1" is undefined
-  	HAL_GPIO_WritePin(
-PIOE,(col0 | col1 | col2 | col3),GPIO_PIN_RESET);
-Sources\gpio.c(57): error:  #20: identifier "col2" is undefined
-  	HAL_GPIO_WritePin(
-PIOE,(col0 | col1 | col2 | col3),GPIO_PIN_RESET);
-Sources\gpio.c(57): error:  #20: identifier "col3" is undefined
-  	HAL_GPIO_WritePin(
-PIOE,(col0 | col1 | col2 | col3),GPIO_PIN_RESET);
-Sources\gpio.c(268): warning:  #1-D: last line of file ends without a newline
-  //Keypad Functions here
-Sources\gpio.c: 2 warnings, 9 errors
-".\Objects\Blinky.axf" - 10 Error(s), 3 Warning(s).
+.\Headers\threads.h(5): warning:  #1-D: last line of file ends without a newline
+  osThreadId startAccelThread(osThreadId accelThreadID);
+Sources\main.c: 2 warnings, 0 errors
+compiling gpio.c...
+.\Headers\gpio.h(71): warning:  #1-D: last line of file ends without a newline
+  #endif /*__ pinoutConfig_H */
+Sources\gpio.c: 1 warning, 0 errors
+compiling threads.c...
+.\Headers\gpio.h(71): warning:  #1-D: last line of file ends without a newline
+  #endif /*__ pinoutConfig_H */
+Sources\threads.c: 1 warning, 0 errors
+compiling interrupts.c...
+.\Headers\gpio.h(71): warning:  #1-D: last line of file ends without a newline
+  #endif /*__ pinoutConfig_H */
+Sources\interrupts.c(15): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    float updatedTemp = rawTemp * 3.0;
+Sources\interrupts.c(17): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    updatedTemp = updatedTemp / 4095.0;
+Sources\interrupts.c(18): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    updatedTemp = updatedTemp - 0.76;
+Sources\interrupts.c(19): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    updatedTemp = updatedTemp / 0.0025;
+Sources\interrupts.c(20): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    updatedTemp = updatedTemp + 25.0;
+Sources\interrupts.c(67): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  		setCurrentDisplayTemp((int)((getCurrentTemp())*100.0));
+Sources\interrupts.c(79): warning:  #1-D: last line of file ends without a newline
+  }
+Sources\interrupts.c: 8 warnings, 0 errors
+compiling RTX_Conf_CM.c...
+compiling LIS3DSH.c...
+Accelerometer\src\LIS3DSH.c(369): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          *out =(float)(
+IS3DSH_SENSITIVITY_2G * (float)aggregateResult);
+Accelerometer\src\LIS3DSH.c(379): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          *out =(float)(
+IS3DSH_SENSITIVITY_4G * (float)aggregateResult);
+Accelerometer\src\LIS3DSH.c(389): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          *out =(float)(
+IS3DSH_SENSITIVITY_6G * (float)aggregateResult);
+Accelerometer\src\LIS3DSH.c(399): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          *out =(float)(
+IS3DSH_SENSITIVITY_8G * (float)aggregateResult);
+Accelerometer\src\LIS3DSH.c(409): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          *out =(float)(
+IS3DSH_SENSITIVITY_16G * (float)aggregateResult);
+Accelerometer\src\LIS3DSH.c: 5 warnings, 0 errors
+compiling stm32f4xx_hal.c...
+compiling stm32f4xx_hal_adc.c...
+compiling stm32f4xx_hal_adc_ex.c...
+compiling stm32f4xx_hal_dma_ex.c...
+compiling stm32f4xx_hal_dma.c...
+compiling stm32f4xx_hal_cortex.c...
+compiling stm32f4xx_hal_gpio.c...
+compiling stm32f4xx_hal_pwr.c...
+compiling stm32f4xx_hal_pwr_ex.c...
+compiling stm32f4xx_hal_rcc_ex.c...
+compiling stm32f4xx_hal_spi.c...
+compiling stm32f4xx_hal_rcc.c...
+compiling stm32f4xx_hal_tim_ex.c...
+compiling stm32f4xx_hal_uart.c...
+assembling startup_stm32f407xx.s...
+compiling stm32f4xx_hal_tim.c...
+compiling system_stm32f4xx.c...
+compiling stm32f4xx_hal_usart.c...
+linking...
+.\Objects\Blinky.axf: Error: L6200E: Symbol SysTick_Handler multiply defined (by hal_cm4.o and interrupts.o).
+Not enough information to list image symbols.
+Not enough information to list the image map.
+Finished: 2 information, 0 warning and 1 error messages.
+".\Objects\Blinky.axf" - 1 Error(s), 17 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -76,28 +111,28 @@ Package Vendor: ARM
                 ::CMSIS:RTOS:1.0.0 (API)
                 CMSIS (Cortex Microcontroller Software Interface Standard)
    * Component: RTOS Version: 1.0.0
+   * Component: CORE Version: 5.0.1
+   * Component: DSP Version: 1.5.1
+   * Component: Keil RTX Version: 4.81.0
 
 Package Vendor: Keil
                 http://www.keil.com/pack/Keil.STM32F4xx_DFP.2.8.0.pack
-                Keil::Device:STM32Cube Framework:Classic:1.4.2
+                ::Device:STM32Cube Framework:1.0.0 (API)
                 STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
+   * Component: STM32Cube Framework Version: 1.0.0
+   * Component: Startup Version: 2.4.2
    * Component: Classic Version: 1.4.2
-   * Component: Cortex Version: 1.4.2
-   * Component: DMA Version: 1.4.2
    * Component: Common Version: 1.4.2
-   * Component: ADC Version: 1.4.2
-   * Component: PWR Version: 1.4.2
    * Component: GPIO Version: 1.4.2
-   * Component: SPI Version: 1.4.2
+   * Component: PWR Version: 1.4.2
+   * Component: DMA Version: 1.4.2
+   * Component: Cortex Version: 1.4.2
+   * Component: ADC Version: 1.4.2
    * Component: RCC Version: 1.4.2
+   * Component: USART Version: 1.4.2
+   * Component: SPI Version: 1.4.2
    * Component: TIM Version: 1.4.2
    * Component: UART Version: 1.4.2
-   * Component: USART Version: 1.4.2
-   * Component: Startup Version: 2.4.2
-   * Component: STM32Cube Framework Version: 1.0.0
-   * Component: CORE Version: 5.0.1
-   * Component: Keil RTX Version: 4.81.0
-   * Component: DSP Version: 1.5.1
 
 <h2>Collection of Component include folders:</h2>
   .\RTE\Device\STM32F407VGTx
@@ -111,43 +146,76 @@ Package Vendor: Keil
 
    * Component: ::CMSIS:RTOS:1.0.0 (API)
 
+   * Component: ARM::CMSIS:CORE:5.0.1
+
+   * Component: ARM::CMSIS:DSP:1.5.1
+      Include file:  CMSIS\Include\arm_math.h
+      Library file:  CMSIS\Lib\ARM\arm_cortexM4lf_math.lib
+
+   * Component: ARM::CMSIS:RTOS:Keil RTX:4.81.0
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Thread.c
+      Source file:   CMSIS\RTOS\RTX\SRC\ARM\SVC_Table.s
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Semaphore.c
+      Include file:  CMSIS\RTOS\RTX\INC\cmsis_os.h
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Mutex.c
+      Include file:  CMSIS\RTOS\RTX\UserCodeTemplates\osObjects.h
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\main.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MsgQueue.c
+      Source file:   CMSIS\RTOS\RTX\Templates\RTX_Conf_CM.c
+      Library file:  CMSIS\RTOS\RTX\LIB\ARM\RTX_CM4.lib
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MailQueue.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MemPool.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Timer.c
+
+   * Component: ::Device:STM32Cube Framework:1.0.0 (API)
+
+   * Component: Keil::Device:Startup:2.4.2
+      Source file:   MDK\Device\Source\ARM\STM32F40xxx_41xxx_OPT.s
+      Source file:   MDK\Device\Source\ARM\STM32F4xx_OTP.s
+      Include file:  Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
+      Source file:   Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f407xx.s
+      Source file:   Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c
+
    * Component: Keil::Device:STM32Cube Framework:Classic:1.4.2
       Include file:  CMSIS\Driver\Config\RTE_Device.h
+      Include file:  MDK\Templates\Inc\stm32f4xx_hal_conf.h
+      Source file:   MDK\Templates\Src\stm32f4xx_hal_msp.c
+      Include file:  MDK\Templates\Inc\stm32f4xx_it.h
+      Source file:   MDK\Templates\Src\stm32f4xx_it.c
       Source file:   MDK\Templates\Src\main.c
       Include file:  MDK\Templates\Inc\main.h
-      Include file:  MDK\Templates\Inc\stm32f4xx_it.h
-      Include file:  MDK\Templates\Inc\stm32f4xx_hal_conf.h
-      Source file:   MDK\Templates\Src\stm32f4xx_it.c
-      Source file:   MDK\Templates\Src\stm32f4xx_hal_msp.c
 
-   * Component: Keil::Device:STM32Cube HAL:Cortex:1.4.2
-      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.c
+   * Component: Keil::Device:STM32Cube HAL:Common:1.4.2
+      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.c
+      Include file:  Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h
+
+   * Component: Keil::Device:STM32Cube HAL:GPIO:1.4.2
+      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c
+
+   * Component: Keil::Device:STM32Cube HAL:PWR:1.4.2
+      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_pwr.c
+      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_pwr_ex.c
 
    * Component: Keil::Device:STM32Cube HAL:DMA:1.4.2
       Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_dma_ex.c
       Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_dma.c
 
-   * Component: Keil::Device:STM32Cube HAL:Common:1.4.2
-      Include file:  Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h
-      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.c
+   * Component: Keil::Device:STM32Cube HAL:Cortex:1.4.2
+      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.c
 
    * Component: Keil::Device:STM32Cube HAL:ADC:1.4.2
       Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_adc_ex.c
       Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_adc.c
 
-   * Component: Keil::Device:STM32Cube HAL:PWR:1.4.2
-      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_pwr_ex.c
-      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_pwr.c
+   * Component: Keil::Device:STM32Cube HAL:RCC:1.4.2
+      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc_ex.c
+      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc.c
 
-   * Component: Keil::Device:STM32Cube HAL:GPIO:1.4.2
-      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c
+   * Component: Keil::Device:STM32Cube HAL:USART:1.4.2
+      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_usart.c
 
    * Component: Keil::Device:STM32Cube HAL:SPI:1.4.2
       Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_spi.c
-
-   * Component: Keil::Device:STM32Cube HAL:RCC:1.4.2
-      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc.c
-      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc_ex.c
 
    * Component: Keil::Device:STM32Cube HAL:TIM:1.4.2
       Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim.c
@@ -155,41 +223,8 @@ Package Vendor: Keil
 
    * Component: Keil::Device:STM32Cube HAL:UART:1.4.2
       Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_uart.c
-
-   * Component: Keil::Device:STM32Cube HAL:USART:1.4.2
-      Source file:   Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_usart.c
-
-   * Component: Keil::Device:Startup:2.4.2
-      Include file:  Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-      Source file:   MDK\Device\Source\ARM\STM32F4xx_OTP.s
-      Source file:   MDK\Device\Source\ARM\STM32F40xxx_41xxx_OPT.s
-      Source file:   Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f407xx.s
-      Source file:   Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c
-
-   * Component: ::Device:STM32Cube Framework:1.0.0 (API)
-
-   * Component: ARM::CMSIS:CORE:5.0.1
-
-   * Component: ARM::CMSIS:RTOS:Keil RTX:4.81.0
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MailQueue.c
-      Include file:  CMSIS\RTOS\RTX\INC\cmsis_os.h
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MemPool.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MsgQueue.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Mutex.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Semaphore.c
-      Source file:   CMSIS\RTOS\RTX\Templates\RTX_Conf_CM.c
-      Include file:  CMSIS\RTOS\RTX\UserCodeTemplates\osObjects.h
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\main.c
-      Library file:  CMSIS\RTOS\RTX\LIB\ARM\RTX_CM4.lib
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Timer.c
-      Source file:   CMSIS\RTOS\RTX\SRC\ARM\SVC_Table.s
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Thread.c
-
-   * Component: ARM::CMSIS:DSP:1.5.1
-      Library file:  CMSIS\Lib\ARM\arm_cortexM4lf_math.lib
-      Include file:  CMSIS\Include\arm_math.h
 Target not created.
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:07
 </pre>
 </body>
 </html>
