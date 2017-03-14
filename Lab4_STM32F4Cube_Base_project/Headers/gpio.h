@@ -14,6 +14,7 @@
 #define DIGIT_CONTROL_2 GPIO_PIN_2
 #define DIGIT_CONTROL_3 GPIO_PIN_4
 #define DIGIT_CONTROL_4 GPIO_PIN_5
+
 //GPIOB	 
 #define SEG0 GPIO_PIN_0
 #define SEG1 GPIO_PIN_1
@@ -24,7 +25,7 @@
 #define SEG6 GPIO_PIN_8
 #define SEG7 GPIO_PIN_11
 	 
-//GPIOE
+//GPIOE - Keypad
 #define ROW0 GPIO_PIN_4
 #define ROW1 GPIO_PIN_5
 #define ROW2 GPIO_PIN_6

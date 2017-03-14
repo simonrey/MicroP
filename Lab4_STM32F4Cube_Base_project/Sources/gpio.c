@@ -25,43 +25,18 @@ void enableClockGPIO(void){
 
 void initKeypadGPIO_1(GPIO_InitTypeDef * gpioInitType){
 	
-	HAL_GPIO_DeInit(GPIOA,GPIO_PIN_5);
-	HAL_GPIO_DeInit(GPIOB,GPIO_PIN_4);
-	HAL_GPIO_DeInit(GPIOC,GPIO_PIN_3);
-	HAL_GPIO_DeInit(GPIOD,GPIO_PIN_2);
-	HAL_GPIO_DeInit(GPIOE,(GPIO_PIN_5|GPIO_PIN_4|GPIO_PIN_3|GPIO_PIN_2));
+	HAL_GPIO_DeInit(GPIOE,(ROW0 | ROW1 | ROW2 | ROW3 | COL0 | COL1 | COL2 | COL3));
 
 	
-	//PA5 - Set as input
-	gpioInitType->Pin = ROW0;
+	//Set rows as input
+	gpioInitType->Pin = (ROW0 | ROW1 | ROW2 | ROW3);
 	gpioInitType->Mode = GPIO_MODE_IT_FALLING;
 	gpioInitType->Pull = GPIO_PULLUP;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOA, gpioInitType);
-		
-	//PB4 - Set as input
-	gpioInitType->Pin = ROW1;
-	gpioInitType->Mode =GPIO_MODE_IT_FALLING;
-	gpioInitType->Pull = GPIO_PULLUP;
-	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOB, gpioInitType);
+	HAL_GPIO_Init(GPIOE, gpioInitType);
 	
-	//PC3 - Set as input
-	gpioInitType->Pin = ROW2;
-	gpioInitType->Mode = GPIO_MODE_IT_FALLING;
-	gpioInitType->Pull = GPIO_PULLUP;
-	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOC, gpioInitType);
-
-	//PD2 - Set as input
-	gpioInitType->Pin = ROW3;
-	gpioInitType->Mode = GPIO_MODE_IT_FALLING;
-	gpioInitType->Pull = GPIO_PULLUP;
-	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOD, gpioInitType);
-	
-	//PE5 to PE2 - Set as output
-	gpioInitType->Pin = COL0 | COL1 | COL2| COL3;
+	//Set cols as input
+	gpioInitType->Pin = (COL0 | COL1 | COL2| COL3);
 	gpioInitType->Mode = GPIO_MODE_OUTPUT_PP;
 	gpioInitType->Pull = GPIO_PULLDOWN;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
@@ -71,46 +46,18 @@ void initKeypadGPIO_1(GPIO_InitTypeDef * gpioInitType){
 
 void initKeypadGPIO_2(GPIO_InitTypeDef * gpioInitType){
 	
-	HAL_GPIO_DeInit(GPIOA,GPIO_PIN_5);
-	HAL_GPIO_DeInit(GPIOB,GPIO_PIN_4);
-	HAL_GPIO_DeInit(GPIOC,GPIO_PIN_3);
-	HAL_GPIO_DeInit(GPIOD,GPIO_PIN_2);
-	HAL_GPIO_DeInit(GPIOE,(GPIO_PIN_5|GPIO_PIN_4|GPIO_PIN_3|GPIO_PIN_2));
+	HAL_GPIO_DeInit(GPIOE,(ROW0 | ROW1 | ROW2 | ROW3 | COL0 | COL1 | COL2 | COL3));
 
-	//ROW PA5 set as output
-	gpioInitType->Pin = GPIO_PIN_5;
+	//Set rows as output
+	gpioInitType->Pin = (ROW0 | ROW1 | ROW2 | ROW3);
 	gpioInitType->Mode = GPIO_MODE_OUTPUT_PP;
 	gpioInitType->Pull = GPIO_PULLDOWN;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOA,gpioInitType);
-	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_RESET);
-		
-	//ROW PB4
-	gpioInitType->Pin = GPIO_PIN_4;
-	gpioInitType->Mode = GPIO_MODE_OUTPUT_PP;
-	gpioInitType->Pull = GPIO_PULLDOWN;
-	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOB,gpioInitType);
-	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_4,GPIO_PIN_RESET);
-
-	//RPW PC3
-	gpioInitType->Pin = GPIO_PIN_3;
-	gpioInitType->Mode = GPIO_MODE_OUTPUT_PP;
-	gpioInitType->Pull = GPIO_PULLDOWN;
-	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOC,gpioInitType);
-	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_3,GPIO_PIN_RESET);
-		
-	//ROW PD2
-	gpioInitType->Pin = GPIO_PIN_2;
-	gpioInitType->Mode = GPIO_MODE_OUTPUT_PP;
-	gpioInitType->Pull = GPIO_PULLDOWN;
-	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOD,gpioInitType);
-	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,GPIO_PIN_RESET);
+	HAL_GPIO_Init(GPIOE,gpioInitType);
+	HAL_GPIO_WritePin(GPIOE,(ROW0 | ROW1 | ROW2 | ROW3),GPIO_PIN_RESET);
 	
 	//PE5 to PE2 - Set as input
-	gpioInitType->Pin = (GPIO_PIN_5|GPIO_PIN_4|GPIO_PIN_3|GPIO_PIN_2);
+	gpioInitType->Pin = (COL0 | COL1 | COL2| COL3);
 	gpioInitType->Mode = GPIO_MODE_INPUT;
 	gpioInitType->Pull = GPIO_PULLUP;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
@@ -125,14 +72,14 @@ void initializeDisplayGPIO(GPIO_InitTypeDef * gpioInitType){
 	gpioInitType->Mode = GPIO_MODE_OUTPUT_PP;
 	gpioInitType->Pull = GPIO_PULLDOWN;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_MEDIUM;
-	HAL_GPIO_Init(GPIOE, gpioInitType);
+	HAL_GPIO_Init(GPIOC, gpioInitType);
 
 	//Output on GPIOE -- Segment control lines
 	gpioInitType->Pin = ((SEG0 | SEG1 | SEG2 | SEG3 | SEG4 | SEG5 | SEG6 | SEG7));
 	gpioInitType->Mode = GPIO_MODE_OUTPUT_PP;
 	gpioInitType->Pull = GPIO_PULLUP;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_MEDIUM;
-	HAL_GPIO_Init(GPIOE, gpioInitType);
+	HAL_GPIO_Init(GPIOB, gpioInitType);
 	
 }
 
