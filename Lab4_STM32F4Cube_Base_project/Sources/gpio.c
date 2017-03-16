@@ -8,10 +8,10 @@
 
 int currentDigit = 0;
 int currentDisplayTemp = 0;
+float currentTemp;
 
 float rawTemp;
 float pastTemperatures[50];
-static const float coeffsArray[51] = {0.000950456065525981, 0.0032982880300802, 0.00449132702555116, -0.00147679039173661, -0.0173486722707884, -0.0322288371748662, -0.020649059911765, 0.0395767340724028, 0.141361472999714, 0.24066169296412, 0.282151127183525, 0.24066169296412, 0.141361472999714, 0.0395767340724028, -0.020649059911765, -0.0322288371748662, -0.0173486722707884, -0.00147679039173661, 0.00449132702555116, 0.0032982880300802, 0.000950456065525981};
 int pastTemperaturesIndex = 0;
 
 
@@ -20,7 +20,62 @@ void enableClockGPIO(void){
 	//Enable GPIO clocks here
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+}
 
+void initLED(GPIO_InitTypeDef * handleLED, TIM_HandleTypeDef * handleTIM, TIM_OC_InitTypeDef * initTIM){
+	
+	handleLED->Pin = (LED0 | LED1 | LED2 | LED3);
+	handleLED->Mode = GPIO_MODE_AF_PP;
+	handleLED->Pull = GPIO_NOPULL;
+	handleLED->Speed = GPIO_SPEED_FREQ_HIGH;
+	handleLED->Alternate = GPIO_AF2_TIM4; 
+	HAL_GPIO_Init(GPIOD, handleLED);
+	
+	// init timer
+	__TIM4_CLK_ENABLE();
+	
+	
+
+	handleTIM->Instance = TIM4;
+	
+	handleTIM->Init.ClockDivision			= TIM_CLOCKDIVISION_DIV1;
+	handleTIM->Init.CounterMode			= TIM_COUNTERMODE_UP;
+	handleTIM->Init.Period				= 32;
+	handleTIM->Init.Prescaler			    = 1280;
+	handleTIM->Init.RepetitionCounter	    = 0;
+
+	HAL_TIM_Base_Init(handleTIM);
+    HAL_TIM_Base_Start(handleTIM);
+	
+	HAL_TIM_PWM_MspInit(handleTIM);
+	HAL_TIM_PWM_Start(handleTIM,TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(handleTIM,TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(handleTIM,TIM_CHANNEL_3);
+	HAL_TIM_PWM_Start(handleTIM,TIM_CHANNEL_4);
+	//HAL_TIM_ConfigClockSource????
+	
+	// init pwm channels
+	HAL_TIM_PWM_Init(handleTIM);
+	
+
+	initTIM->OCMode 			= TIM_OCMODE_PWM1;
+	initTIM->OCPolarity 	= TIM_OCPOLARITY_HIGH;
+	initTIM->OCIdleState = TIM_OCIDLESTATE_SET;
+	initTIM->Pulse				= (16);
+	
+	HAL_TIM_PWM_ConfigChannel(handleTIM,initTIM,TIM_CHANNEL_1);
+	HAL_TIM_PWM_ConfigChannel(handleTIM,initTIM,TIM_CHANNEL_2);
+	HAL_TIM_PWM_ConfigChannel(handleTIM,initTIM,TIM_CHANNEL_3);
+	HAL_TIM_PWM_ConfigChannel(handleTIM,initTIM,TIM_CHANNEL_4);
+
+	HAL_TIM_PWM_Start(handleTIM,TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(handleTIM,TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(handleTIM,TIM_CHANNEL_3);
+	HAL_TIM_PWM_Start(handleTIM,TIM_CHANNEL_4);
+	
 }
 
 void initKeypadGPIO_1(GPIO_InitTypeDef * gpioInitType){
@@ -30,8 +85,8 @@ void initKeypadGPIO_1(GPIO_InitTypeDef * gpioInitType){
 	
 	//Set rows as input
 	gpioInitType->Pin = (ROW0 | ROW1 | ROW2 | ROW3);
-	gpioInitType->Mode = GPIO_MODE_IT_FALLING;
-	gpioInitType->Pull = GPIO_PULLUP;
+	gpioInitType->Mode = GPIO_MODE_INPUT;
+	gpioInitType->Pull = GPIO_PULLDOWN;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOE, gpioInitType);
 	
@@ -41,7 +96,7 @@ void initKeypadGPIO_1(GPIO_InitTypeDef * gpioInitType){
 	gpioInitType->Pull = GPIO_PULLDOWN;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOE, gpioInitType);
-	HAL_GPIO_WritePin(GPIOE,(COL0 | COL1 | COL2 | COL3),GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE,(COL0 | COL1 | COL2 | COL3),GPIO_PIN_SET);
 }
 
 void initKeypadGPIO_2(GPIO_InitTypeDef * gpioInitType){
@@ -54,18 +109,18 @@ void initKeypadGPIO_2(GPIO_InitTypeDef * gpioInitType){
 	gpioInitType->Pull = GPIO_PULLDOWN;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOE,gpioInitType);
-	HAL_GPIO_WritePin(GPIOE,(ROW0 | ROW1 | ROW2 | ROW3),GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE,(ROW0 | ROW1 | ROW2 | ROW3),GPIO_PIN_SET);
 	
 	//PE5 to PE2 - Set as input
 	gpioInitType->Pin = (COL0 | COL1 | COL2| COL3);
 	gpioInitType->Mode = GPIO_MODE_INPUT;
-	gpioInitType->Pull = GPIO_PULLUP;
+	gpioInitType->Pull = GPIO_PULLDOWN;
 	gpioInitType->Speed = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOE, gpioInitType);
 	
 }
 
-void initializeDisplayGPIO(GPIO_InitTypeDef * gpioInitType){
+void initDisplayGPIO(GPIO_InitTypeDef * gpioInitType){
 	
 	//Output on GPIOE -- Digit control lines
 	gpioInitType->Pin = ((DIGIT_CONTROL_1 | DIGIT_CONTROL_2 | DIGIT_CONTROL_3 | DIGIT_CONTROL_4));
@@ -104,12 +159,12 @@ void filter(void){
 			float scratchTemp = 0;
 			for(int i = pastTemperaturesIndex; i < 51; i++)
 			{
-				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArray[i - pastTemperaturesIndex];
+				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArrayTemp[i - pastTemperaturesIndex];
 			}
 			
 			for(int i = 0; i < pastTemperaturesIndex; i++)
 			{
-				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArray[i + (51 - pastTemperaturesIndex)];
+				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArrayTemp[i + (51 - pastTemperaturesIndex)];
 			}
 			setCurrentTemp(scratchTemp);
 }
@@ -131,6 +186,14 @@ float getRawTemp(void){
 void setRawTemp(float t){
 	rawTemp = t;
 }
+
+float getCurrentTemp(void){
+	return currentTemp;
+}
+void setCurrentTemp(float t){
+	currentTemp = t;
+}
+
 int getCurrentDigit(void){
 	return currentDigit;
 }
@@ -285,5 +348,10 @@ void setDigitSelectLines(int digit){
 			break;
 	}
 }
+
+void display(void){
+
+}
+
 
 //Keypad Functions here

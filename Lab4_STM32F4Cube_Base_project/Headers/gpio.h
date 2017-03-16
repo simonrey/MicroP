@@ -34,37 +34,51 @@
 #define COL1 GPIO_PIN_9
 #define COL2 GPIO_PIN_10
 #define COL3 GPIO_PIN_11
-	 
 
-	 
+//GPIOD
+#define LED0 GPIO_PIN_12
+#define LED1 GPIO_PIN_13
+#define LED2 GPIO_PIN_14
+#define LED3 GPIO_PIN_15	 
 	 
 static const uint16_t segments[] = {SEG0,SEG1,SEG2,SEG3,SEG4,SEG5,SEG6};
+static const float coeffsArrayTemp[51] = {0.000950456065525981, 0.0032982880300802, 0.00449132702555116, -0.00147679039173661, -0.0173486722707884, -0.0322288371748662, -0.020649059911765, 0.0395767340724028, 0.141361472999714, 0.24066169296412, 0.282151127183525, 0.24066169296412, 0.141361472999714, 0.0395767340724028, -0.020649059911765, -0.0322288371748662, -0.0173486722707884, -0.00147679039173661, 0.00449132702555116, 0.0032982880300802, 0.000950456065525981};
 
 void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-	 
+
+//All GPIO initialization
 void enableClockGPIO(void);
 void initKeypadGPIO_1(GPIO_InitTypeDef * gpioInitType);
 void initKeypadGPIO_2(GPIO_InitTypeDef * gpioInitType);
 void initDisplayGPIO(GPIO_InitTypeDef * gpioInitType);
 
+//These are holdovers from the previous labs
 void setCurrentDigit(int newCurrentDigit);
 int getCurrentDigit(void);
 int updateDigit(int temperature, int digit);
 
+	
+//Setter and getter for temps
 int getCurrentDisplayTemp(void);
 void setCurrentDisplayTemp(int newCurrentDisplayTemp);
-
-void filter(void);
-
 void setRawTemp(float t);
 float getRawTemp(void);
 
+//Temperature functions
+void filter(void);
+
+
+//Display functions
 int SegmentEncoder(int toDecode, int * segArr, int digit);
 void setSegmentSelectLines(int * segmentArray);
 void resetDigitSelectLines(void);
 void setDigitSelectLines(int digit);
+
+void initLED(GPIO_InitTypeDef * handleLED, TIM_HandleTypeDef * handleTIM, TIM_OC_InitTypeDef * initTIM);
+
+void display(void);
 
 #ifdef __cplusplus
 }

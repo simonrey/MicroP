@@ -13,9 +13,17 @@
 #include "main.h"
 #include "gpio.h"
 #include "adc.h"
+#include "accelerometer.h"
+
+
+void displayThread(void const *argument);
+osThreadDef(displayThread, osPriorityNormal, 1, 0);
 
 void tempThread(void const *argument);
 osThreadDef(tempThread, osPriorityNormal, 1, 0);
+
+void accelThread(void const *argument);
+osThreadDef(accelThread, osPriorityNormal, 1, 0);
 
 void Thread_LED (void const *argument);                 // thread function
 osThreadId tid_Thread_LED;                              // thread id
@@ -68,4 +76,43 @@ osThreadId startTempThread(osThreadId tempThreadID){
  *---------------------------------------------------------------------------*/
 void tempThread(void const *argument){
 	initADC(getHandleADC(),getHandleADCChannel(),getHandleDMA(),getReadingADCLocation());
+	while(1){
+		filter();
+		setCurrentDisplayTemp((int)((getCurrentTemp())*100.0));
+	}
 }
+/*----------------------------------------------------------------------------
+ *    Accelerometer Thread Context creation  
+ *---------------------------------------------------------------------------*/
+osThreadId startAccelThread(osThreadId accelThreadID){
+	accelThreadID = osThreadCreate(osThread(accelThread ), NULL);
+	if(!accelThreadID) return NULL;
+	else return(accelThreadID);
+}
+/*----------------------------------------------------------------------------
+ *    Accelerometer thread content 
+ *---------------------------------------------------------------------------*/
+void accelThread(void const *argument){
+	initAccelerometer(getHandleSPI());
+	while(1){
+		ledBrightness(getRollGoal(),getPitchGoal());
+	}
+}
+/*----------------------------------------------------------------------------
+ *    Display Thread Context creation  
+ *---------------------------------------------------------------------------*/
+osThreadId startDisplayThread(osThreadId displayThreadID){
+	displayThreadID = osThreadCreate(osThread(displayThread), NULL);
+	if(!displayThreadID) return NULL;
+	else return(displayThreadID);
+}
+/*----------------------------------------------------------------------------
+ *    Display thread content 
+ *---------------------------------------------------------------------------*/
+void displayThread(void const *argument){
+	while(1){
+		display();
+	}
+}
+
+

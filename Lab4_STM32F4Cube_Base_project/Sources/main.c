@@ -21,7 +21,6 @@ extern void Thread_LED(void const *argument);
 extern osThreadId tid_Thread_LED;
 
 uint32_t readingADC[1];
-float currentTemp;
 	
 	
 GPIO_InitTypeDef keypadGPIO;
@@ -29,6 +28,16 @@ GPIO_InitTypeDef displayGPIO;
 ADC_HandleTypeDef handleADC;
 ADC_ChannelConfTypeDef channelADC;
 DMA_HandleTypeDef handleDMA;
+
+SPI_HandleTypeDef handleSPI;
+
+TIM_HandleTypeDef handleTIM;
+TIM_OC_InitTypeDef initTIM;
+GPIO_InitTypeDef handleLED;
+
+float rollGoal = 0;
+float pitchGoal = 0;
+int mode;
 
 /**
 	These lines are mandatory to make CMSIS-RTOS RTX work with te new Cube HAL
@@ -77,7 +86,7 @@ void SystemClock_Config(void) {
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
 }
 
-
+//HANDLE GETTERS
 uint32_t getReadingADC(void){
 	return readingADC[0]; 
 }
@@ -85,12 +94,8 @@ uint32_t * getReadingADCLocation(void){
 	return readingADC;
 }
 
-
-float getCurrentTemp(void){
-	return currentTemp;
-}
-void setCurrentTemp(float t){
-	currentTemp = t;
+SPI_HandleTypeDef * getHandleSPI(void){
+	return &handleSPI;
 }
 
 ADC_HandleTypeDef * getHandleADC(void){
@@ -102,12 +107,31 @@ DMA_HandleTypeDef * getHandleDMA(void){
 ADC_ChannelConfTypeDef * getHandleADCChannel(void){
 	return &channelADC;
 }
+TIM_HandleTypeDef * getHandleTIM(void){
+	return &handleTIM;
+}
+TIM_OC_InitTypeDef * getInitTIM(void){
+	return &initTIM;
+}
+
+float getRollGoal(void){
+	return rollGoal;
+}
+float getPitchGoal(void){
+	return pitchGoal;
+}
+
+int getMode(void){
+	return mode;
+}
 
 
 int main (void){
 	
 	osThreadId tempThread;
 	osThreadId accelThread;
+	osThreadId keypadThread;
+	osThreadId displayThread;
 	
   osKernelInitialize();                     /* initialize CMSIS-RTOS          */
   HAL_Init();                               /* Initialize the HAL Library     */
@@ -118,6 +142,7 @@ int main (void){
 	enableClockGPIO();
 	initDisplayGPIO(&displayGPIO);
 	initKeypadGPIO_1(&keypadGPIO);
+	initLED(&handleLED, &handleTIM, &initTIM);
 	
 	/*
 	Temperature stuff starts on the initialization of the ADC
@@ -128,6 +153,11 @@ int main (void){
 	
 	tempThread = startTempThread(tempThread);
 	accelThread = startAccelThread(accelThread);
+	displayThread = startDisplayThread(displayThread);
+	
+	if((tempThread || accelThread || displayThread)==NULL){
+		printf("Something went wrong");
+	}
 	
 	
   initializeLED_IO();                       /* Initialize LED GPIO Buttons    */
