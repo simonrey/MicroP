@@ -139,37 +139,13 @@ void initDisplayGPIO(GPIO_InitTypeDef * gpioInitType){
 }
 
 
-//Segmennt Display Functions here
-
+//Display Functions here
 int getCurrentDisplayTemp(void){
 	return currentDisplayTemp;
 }
 void setCurrentDisplayTemp(int newCurrentDisplayTemp){
 	currentDisplayTemp = newCurrentDisplayTemp;
 }
-
-
-void filter(void){
-			pastTemperatures[pastTemperaturesIndex] = getRawTemp();
-			pastTemperaturesIndex++;
-			if(pastTemperaturesIndex > 50)
-			{
-				pastTemperaturesIndex = 0;
-			}
-			float scratchTemp = 0;
-			for(int i = pastTemperaturesIndex; i < 51; i++)
-			{
-				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArrayTemp[i - pastTemperaturesIndex];
-			}
-			
-			for(int i = 0; i < pastTemperaturesIndex; i++)
-			{
-				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArrayTemp[i + (51 - pastTemperaturesIndex)];
-			}
-			setCurrentTemp(scratchTemp);
-}
-
-
 int updateDigit(int temperature, int digit){
 	int s[8] = {0};
 	int digitValue = (int)(temperature/(pow((double)10,(double)(digit)))) % 10; //isolates the digit to be updated of the temperature
@@ -179,26 +155,6 @@ int updateDigit(int temperature, int digit){
 	setDigitSelectLines(digit);
 	
 	return 0;
-}
-float getRawTemp(void){
-	return rawTemp;
-}
-void setRawTemp(float t){
-	rawTemp = t;
-}
-
-float getCurrentTemp(void){
-	return currentTemp;
-}
-void setCurrentTemp(float t){
-	currentTemp = t;
-}
-
-int getCurrentDigit(void){
-	return currentDigit;
-}
-void setCurrentDigit(int newCurrentDigit){
-	currentDigit = newCurrentDigit;
 }
 int SegmentEncoder(int toDecode, int * segArr, int digit){
 	
@@ -312,14 +268,12 @@ int SegmentEncoder(int toDecode, int * segArr, int digit){
 		}
 		return isNegative;
 }
-
 void setSegmentSelectLines(int * segmentArray){
 	for(int i = 0 ; i < 7 ; i++){
 		if(segmentArray[i]) HAL_GPIO_WritePin(GPIOE, segments[i], GPIO_PIN_SET);
 		else HAL_GPIO_WritePin(GPIOE,segments[i], GPIO_PIN_RESET);
 	}
 }
-
 void resetDigitSelectLines(void){
 	HAL_GPIO_WritePin(GPIOE, DIGIT_CONTROL_1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOE, DIGIT_CONTROL_2, GPIO_PIN_RESET);
@@ -348,10 +302,122 @@ void setDigitSelectLines(int digit){
 			break;
 	}
 }
+//Temperature Functions
+void filter(void){
+			pastTemperatures[pastTemperaturesIndex] = getRawTemp();
+			pastTemperaturesIndex++;
+			if(pastTemperaturesIndex > 50)
+			{
+				pastTemperaturesIndex = 0;
+			}
+			float scratchTemp = 0;
+			for(int i = pastTemperaturesIndex; i < 51; i++)
+			{
+				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArrayTemp[i - pastTemperaturesIndex];
+			}
+			
+			for(int i = 0; i < pastTemperaturesIndex; i++)
+			{
+				scratchTemp = scratchTemp + pastTemperatures[i]*coeffsArrayTemp[i + (51 - pastTemperaturesIndex)];
+			}
+			setCurrentTemp(scratchTemp);
+}
+float getRawTemp(void){
+	return rawTemp;
+}
+void setRawTemp(float t){
+	rawTemp = t;
+}
+float getCurrentTemp(void){
+	return currentTemp;
+}
+void setCurrentTemp(float t){
+	currentTemp = t;
+}
+int getCurrentDigit(void){
+	return currentDigit;
+}
+void setCurrentDigit(int newCurrentDigit){
+	currentDigit = newCurrentDigit;
+}
 
+//Project Mode Control
 void display(void){
 
 }
 
 
 //Keypad Functions here
+int getRowSelected()
+{
+    if(HAL_GPIO_ReadPin(GPIOE,ROW0))
+    {
+        return 4;
+    }
+    else if(HAL_GPIO_ReadPin(GPIOE,ROW1))
+    {
+        return 3;
+    }
+    else if(HAL_GPIO_ReadPin(GPIOE,ROW2))
+    {
+        return 2;
+    }
+    else if(HAL_GPIO_ReadPin(GPIOE,ROW3))
+    {
+        return 1;
+    }
+    return 0;
+}
+int getColumnSelected()
+{
+    if(HAL_GPIO_ReadPin(GPIOE,COL0))
+    {
+        return 1;
+    }
+    else if(HAL_GPIO_ReadPin(GPIOE,COL1))
+    {
+        return 2;
+    }
+    else if(HAL_GPIO_ReadPin(GPIOE,COL2))
+    {
+        return 3;
+    }
+    else if(HAL_GPIO_ReadPin(GPIOE,COL3))
+    {
+        return 4;
+    }
+    return 0;    
+}
+int powerOfTen(int exponent)
+{
+    if(exponent == 0)
+    {
+        return 1;
+    }
+    else if(exponent == 1)
+    {
+        return 10;
+    }
+    else if(exponent == 2)
+    {
+        return 100;
+    }
+		return 0;
+}
+int deleteLastNumber(int angle)
+{
+    if(angle < 10)
+    {
+        return 0;
+    }
+    else if(angle < 100)
+    {
+        return angle%10;
+    }
+    else if(angle < 1000)
+    {
+        return angle%100;
+    }
+    
+    return 0;
+}

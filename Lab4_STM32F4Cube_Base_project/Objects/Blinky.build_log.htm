@@ -22,39 +22,21 @@ Dialog DLL:      TCM.DLL V1.21.0.0
  
 <h2>Project:</h2>
 C:\Users\Ludo Reynders\Documents\MicroP\Lab4_STM32F4Cube_Base_project\Blinky.uvprojx
-Project File Date:  03/15/2017
+Project File Date:  03/16/2017
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Rebuild target 'Lab4'
 compiling supporting_functions.c...
-compiling adc.c...
-compiling main.c...
-.\Headers\gpio.h(86): warning:  #1-D: last line of file ends without a newline
-  #endif /*__ pinoutConfig_H */
-.\Headers\threads.h(6): warning:  #1-D: last line of file ends without a newline
-  osThreadId startDisplayThread(osThreadId displayThreadID);
-Sources\main.c(133): warning:  #177-D: variable "keypadThread"  was declared but never referenced
-  	osThreadId keypadThread;
-Sources\main.c: 3 warnings, 0 errors
 compiling threads.c...
-.\Headers\main.h(17): warning:  #1-D: last line of file ends without a newline
-  int getMode(void);
-.\Headers\gpio.h(86): warning:  #1-D: last line of file ends without a newline
-  #endif /*__ pinoutConfig_H */
-.\Headers\accelerometer.h(26): warning:  #1-D: last line of file ends without a newline
-  	 
-Sources\threads.c(81): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+.\Headers\accelerometer.h(27): warning:  #1-D: last line of file ends without a newline
+  	
+Sources\threads.c(83): warning:  #1035-D: single-precision operand implicitly converted to double-precision
   		setCurrentDisplayTemp((int)((getCurrentTemp())*100.0));
-Sources\threads.c: 4 warnings, 0 errors
-compiling RTX_Conf_CM.c...
+Sources\threads.c: 2 warnings, 0 errors
 compiling interrupts.c...
-.\Headers\accelerometer.h(26): warning:  #1-D: last line of file ends without a newline
-  	 
-.\Headers\gpio.h(86): warning:  #1-D: last line of file ends without a newline
-  #endif /*__ pinoutConfig_H */
-.\Headers\main.h(17): warning:  #1-D: last line of file ends without a newline
-  int getMode(void);
+.\Headers\accelerometer.h(27): warning:  #1-D: last line of file ends without a newline
+  	
 Sources\interrupts.c(16): warning:  #1035-D: single-precision operand implicitly converted to double-precision
     float updatedTemp = rawTemp * 3.0;
 Sources\interrupts.c(18): warning:  #1035-D: single-precision operand implicitly converted to double-precision
@@ -65,20 +47,13 @@ Sources\interrupts.c(20): warning:  #1035-D: single-precision operand implicitly
     updatedTemp = updatedTemp / 0.0025;
 Sources\interrupts.c(21): warning:  #1035-D: single-precision operand implicitly converted to double-precision
     updatedTemp = updatedTemp + 25.0;
-Sources\interrupts.c: 8 warnings, 0 errors
+Sources\interrupts.c: 6 warnings, 0 errors
+compiling main.c...
+compiling RTX_Conf_CM.c...
 compiling gpio.c...
-.\Headers\gpio.h(86): warning:  #1-D: last line of file ends without a newline
-  #endif /*__ pinoutConfig_H */
-.\Headers\main.h(17): warning:  #1-D: last line of file ends without a newline
-  int getMode(void);
-Sources\gpio.c: 2 warnings, 0 errors
 compiling accelerometer.c...
-.\Headers\gpio.h(86): warning:  #1-D: last line of file ends without a newline
-  #endif /*__ pinoutConfig_H */
-.\Headers\main.h(17): warning:  #1-D: last line of file ends without a newline
-  int getMode(void);
-.\Headers\accelerometer.h(26): warning:  #1-D: last line of file ends without a newline
-  	 
+.\Headers\accelerometer.h(27): warning:  #1-D: last line of file ends without a newline
+  	
 Sources\accelerometer.c(56): warning:  #1035-D: single-precision operand implicitly converted to double-precision
   	float levelPitch = (32.0 * pitchResult/180.0);
 Sources\accelerometer.c(70): warning:  #1035-D: single-precision operand implicitly converted to double-precision
@@ -89,7 +64,8 @@ Sources\accelerometer.c(92): warning:  #1035-D: single-precision operand implici
   	return (rawX*-0.000022173875989 + rawY*0.000959285589914 + rawZ*-0.000004686872148 -0.010543316906594); 
 Sources\accelerometer.c(96): warning:  #1035-D: single-precision operand implicitly converted to double-precision
   	return (rawX*-0.000003976693405 + rawY*-0.000008559170730 + rawZ*0.000991525335892 -0.020677895349495); 
-Sources\accelerometer.c: 8 warnings, 0 errors
+Sources\accelerometer.c: 6 warnings, 0 errors
+compiling adc.c...
 compiling LIS3DSH.c...
 Accelerometer\src\LIS3DSH.c(369): warning:  #1035-D: single-precision operand implicitly converted to double-precision
           *out =(float)(
@@ -110,36 +86,36 @@ Accelerometer\src\LIS3DSH.c: 5 warnings, 0 errors
 compiling stm32f4xx_hal.c...
 compiling stm32f4xx_hal_adc_ex.c...
 compiling stm32f4xx_hal_dma_ex.c...
+compiling stm32f4xx_hal_gpio.c...
+compiling stm32f4xx_hal_cortex.c...
 compiling stm32f4xx_hal_adc.c...
 compiling stm32f4xx_hal_dma.c...
-compiling stm32f4xx_hal_cortex.c...
-compiling stm32f4xx_hal_gpio.c...
 compiling stm32f4xx_hal_pwr_ex.c...
-compiling stm32f4xx_hal_tim_ex.c...
-compiling stm32f4xx_hal_rcc_ex.c...
-compiling stm32f4xx_hal_spi.c...
 compiling stm32f4xx_hal_pwr.c...
-assembling startup_stm32f407xx.s...
+compiling stm32f4xx_hal_tim_ex.c...
 compiling stm32f4xx_hal_rcc.c...
+compiling stm32f4xx_hal_rcc_ex.c...
+assembling startup_stm32f407xx.s...
+compiling stm32f4xx_hal_spi.c...
 compiling stm32f4xx_hal_tim.c...
 compiling system_stm32f4xx.c...
 compiling stm32f4xx_hal_uart.c...
 compiling stm32f4xx_hal_usart.c...
 linking...
-.\Objects\Blinky.axf: error: L6050U: The code size of this image (48388 bytes) exceeds the maximum allowed for this version of the linker.
+.\Objects\Blinky.axf: error: L6050U: The code size of this image (49220 bytes) exceeds the maximum allowed for this version of the linker.
 Finished: 0 information, 0 warning, 0 error and 1 fatal error messages.
-".\Objects\Blinky.axf" - 1 Error(s), 30 Warning(s).
+".\Objects\Blinky.axf" - 1 Error(s), 19 Warning(s).
 
 <h2>Software Packages used:</h2>
 
 Package Vendor: ARM
                 http://www.keil.com/pack/ARM.CMSIS.5.0.0.pack
-                ARM::CMSIS:DSP:1.4.6
+                ::CMSIS:RTOS:1.0 (API)
                 CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: RTOS Version: 1.0
+   * Component: CORE Version: 5.0.0
    * Component: DSP Version: 1.4.6
    * Component: Keil RTX Version: 4.81.0
-   * Component: CORE Version: 5.0.0
-   * Component: RTOS Version: 1.0
 
 Package Vendor: Keil
                 http://www.keil.com/pack/Keil.STM32F4xx_DFP.2.8.0.pack
@@ -170,11 +146,18 @@ Package Vendor: Keil
 
 <h2>Collection of Component Files used:</h2>
 
+   * Component: ::CMSIS:RTOS:1.0 (API)
+
+   * Component: ARM::CMSIS:CORE:5.0.0
+
    * Component: ARM::CMSIS:DSP:1.4.6
       Include file:  CMSIS\Include\arm_math.h
       Library file:  CMSIS\Lib\ARM\arm_cortexM4lf_math.lib
 
    * Component: ARM::CMSIS:RTOS:Keil RTX:4.81.0
+      Include file:  CMSIS\RTOS\RTX\INC\cmsis_os.h
+      Source file:   CMSIS\RTOS\RTX\Templates\RTX_Conf_CM.c
+      Include file:  CMSIS\RTOS\RTX\UserCodeTemplates\osObjects.h
       Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\main.c
       Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MailQueue.c
       Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MemPool.c
@@ -185,13 +168,6 @@ Package Vendor: Keil
       Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Timer.c
       Source file:   CMSIS\RTOS\RTX\SRC\ARM\SVC_Table.s
       Library file:  CMSIS\RTOS\RTX\LIB\ARM\RTX_CM4.lib
-      Include file:  CMSIS\RTOS\RTX\INC\cmsis_os.h
-      Source file:   CMSIS\RTOS\RTX\Templates\RTX_Conf_CM.c
-      Include file:  CMSIS\RTOS\RTX\UserCodeTemplates\osObjects.h
-
-   * Component: ARM::CMSIS:CORE:5.0.0
-
-   * Component: ::CMSIS:RTOS:1.0 (API)
 
    * Component: ::Device:STM32Cube Framework:1.0.0 (API)
 

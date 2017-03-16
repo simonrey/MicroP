@@ -22,22 +22,30 @@ extern osThreadId tid_Thread_LED;
 
 uint32_t readingADC[1];
 	
-	
+//All handles
 GPIO_InitTypeDef keypadGPIO;
 GPIO_InitTypeDef displayGPIO;
 ADC_HandleTypeDef handleADC;
 ADC_ChannelConfTypeDef channelADC;
 DMA_HandleTypeDef handleDMA;
-
 SPI_HandleTypeDef handleSPI;
-
 TIM_HandleTypeDef handleTIM;
 TIM_OC_InitTypeDef initTIM;
 GPIO_InitTypeDef handleLED;
 
+//Accelerometer Variables
 float rollGoal = 0;
 float pitchGoal = 0;
+
+//Project Mode
 int mode;
+
+//Keypad Variables
+int isDisplayingTargetAngle 			= 0;
+int tempTargetRollAngle 					= 0;
+int tempTargetPitchAngle					= 0;
+int	currentTargetRollAngle				= 0;
+int currentTargetPitchAngle				= 0;
 
 /**
 	These lines are mandatory to make CMSIS-RTOS RTX work with te new Cube HAL
@@ -86,7 +94,7 @@ void SystemClock_Config(void) {
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
 }
 
-//HANDLE GETTERS
+//HANDLE ACCESSORS
 uint32_t getReadingADC(void){
 	return readingADC[0]; 
 }
@@ -113,16 +121,51 @@ TIM_HandleTypeDef * getHandleTIM(void){
 TIM_OC_InitTypeDef * getInitTIM(void){
 	return &initTIM;
 }
+GPIO_InitTypeDef * getKeypadGPIO(void){
+	return &keypadGPIO;
+}
 
+//Variable ACCESSORS
 float getRollGoal(void){
 	return rollGoal;
 }
 float getPitchGoal(void){
 	return pitchGoal;
 }
-
 int getMode(void){
 	return mode;
+}
+int getIsDisplayingTargetAngle(void){
+	return isDisplayingTargetAngle;
+}
+int getTempTargetRollAngle(void){
+	return tempTargetRollAngle;
+}
+int getTempTargetPitchAngle(void){
+	return tempTargetPitchAngle;
+}
+int getCurrentTargetRollAngle(void){
+	return currentTargetRollAngle;
+}
+int getCurrentTargetPitchAngle(void){
+	return currentTargetPitchAngle;
+}
+
+//Variable Mutators
+void setIsDisplayingTargetAngle(int newValue){
+	isDisplayingTargetAngle = newValue;
+}
+void setTempTargetRollAngle(int newValue){
+	tempTargetRollAngle = newValue;
+}
+void setTempTargetPitchAngle(int newValue){
+	tempTargetPitchAngle = newValue;
+}
+void setCurrentTargetRollAngle(int newValue){
+	currentTargetRollAngle = newValue;
+}
+void setCurrentTargetPitchAngle(int newValue){
+	currentTargetPitchAngle = newValue;
 }
 
 
@@ -154,7 +197,7 @@ int main (void){
 	tempThread = startTempThread(tempThread);
 	accelThread = startAccelThread(accelThread);
 	displayThread = startDisplayThread(displayThread);
-	
+	keypadThread = startKeypadThread(keypadThread);
 	if((tempThread || accelThread || displayThread)==NULL){
 		printf("Something went wrong");
 	}

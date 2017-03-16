@@ -15,6 +15,8 @@
 #include "adc.h"
 #include "accelerometer.h"
 
+void keypadThread(void const *argument);
+osThreadDef(keypadThread, osPriorityNormal, 1, 0);
 
 void displayThread(void const *argument);
 osThreadDef(displayThread, osPriorityNormal, 1, 0);
@@ -112,6 +114,147 @@ osThreadId startDisplayThread(osThreadId displayThreadID){
 void displayThread(void const *argument){
 	while(1){
 		display();
+	}
+}
+/*----------------------------------------------------------------------------
+ *    Keypad Thread Context creation  
+ *---------------------------------------------------------------------------*/
+osThreadId startKeypadThread(osThreadId keypadThreadID){
+	keypadThreadID = osThreadCreate(osThread(keypadThread), NULL);
+	if(!keypadThreadID) return NULL;
+	else return(keypadThreadID);
+}
+/*----------------------------------------------------------------------------
+ *    Keypad thread content 
+ *---------------------------------------------------------------------------*/
+void keypadThread(void const * argument){
+	//thread content
+	int row 						= 0;
+	int column 					= 0;
+	int number 					= 0;
+	int currentDigit    = 0;
+	int	keyWasPressed 	= 0;
+	int starCount				= 0;
+
+	while (1)
+    {
+        row = getRowSelected();
+        if(row != 0)
+        {
+            initKeypadGPIO_2(getKeypadGPIO());
+            column = getColumnSelected();
+            initKeypadGPIO_1(getKeypadGPIO());
+						setIsDisplayingTargetAngle(1); // display temp target angle
+        }
+        
+        if(currentDigit == 0)
+        {
+            setTempTargetRollAngle(0);
+            setTempTargetPitchAngle(0);
+        }
+            
+        if(keyWasPressed > 0 && row == 0)
+        {
+            keyWasPressed--;
+        }
+        
+        // handles numbers #
+        if(row == 4 && column == 3 && keyWasPressed == 0)
+        {
+            if(currentDigit <4 && currentDigit != 0)
+            {
+                currentDigit = 4;
+            }
+            else
+            {
+								setCurrentTargetRollAngle(getTempTargetRollAngle());
+								setCurrentTargetPitchAngle(getTempTargetPitchAngle());
+                setIsDisplayingTargetAngle(0); // back to displaying emperatures
+							
+                //printf("%i,%i \n",getCurrentTargetRollAngle(),getCurrentTargetPitchAngle());
+                row = 0;
+                column = 0;
+                currentDigit = 0;
+                setTempTargetRollAngle(0);
+                setTempTargetPitchAngle(0);
+            }
+            
+            keyWasPressed = 1000;
+        }
+        // handles numbers *
+        if(row == 4 && column == 1 && keyWasPressed == 0)
+        {
+            if(currentDigit <4 && currentDigit > 0)
+            {
+                setTempTargetRollAngle(deleteLastNumber(getTempTargetRollAngle()));
+                currentDigit--;
+            }
+            else if (currentDigit >4)
+            {
+                setTempTargetPitchAngle(deleteLastNumber(getTempTargetPitchAngle()));
+                currentDigit--;
+            }
+            
+            keyWasPressed = 1000;
+            //printf("%i,%i \n",getCurrentTargetRollAngle(),getCurrentTargetPitchAngle());
+        }
+        else if(row == 4 && column == 1 && keyWasPressed != 0)
+        {
+            starCount++;
+            if(starCount > 30000)
+            {
+                starCount = 0;
+                row = 0;
+                column = 0;
+                currentDigit = 0;
+                setTempTargetRollAngle(0);
+                setTempTargetPitchAngle(0);
+                //printf("star count complete \n");
+            }
+                
+        }
+        
+        // handles numbers 0
+        if(row == 4 && column == 2 && keyWasPressed == 0 && currentDigit < 7 && currentDigit != 3)
+        {
+            keyWasPressed = 1000;
+            number = 0;
+            if(currentDigit <3)
+            {
+                setTempTargetRollAngle(getTempTargetRollAngle() + (number * powerOfTen(currentDigit)));
+                currentDigit++;
+            }
+            else
+            {
+                setTempTargetPitchAngle(getTempTargetPitchAngle() + (number * powerOfTen(currentDigit - 3.0)));
+                currentDigit++;
+            }
+
+            //printf("%i,%i \n",getCurrentTargetRollAngle(),getCurrentTargetPitchAngle());
+            row = 0;
+            column = 0;
+        }
+        
+        // handles numbers 1-9
+        if(row != 0 && column != 0 && keyWasPressed == 0 && column != 4 && row != 4 && currentDigit < 7 && currentDigit != 3)
+        {
+            keyWasPressed = 1000;
+            number = ((row - 1) * 3) + column;
+            if(currentDigit <3)
+            {
+                setTempTargetRollAngle(getTempTargetRollAngle() + (number * powerOfTen(currentDigit)));
+                currentDigit++;
+            }
+            else
+            {
+                setTempTargetPitchAngle(getTempTargetPitchAngle() + (number * powerOfTen(currentDigit - 4.0)));
+                currentDigit++;
+            }
+
+            //printf("%i,%i \n",getCurrentTargetRollAngle(),getCurrentTargetPitchAngle());
+            row = 0;
+            column = 0;
+        }
 	}
 }
 

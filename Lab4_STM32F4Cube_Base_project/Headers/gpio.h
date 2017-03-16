@@ -53,6 +53,7 @@ void enableClockGPIO(void);
 void initKeypadGPIO_1(GPIO_InitTypeDef * gpioInitType);
 void initKeypadGPIO_2(GPIO_InitTypeDef * gpioInitType);
 void initDisplayGPIO(GPIO_InitTypeDef * gpioInitType);
+void initLED(GPIO_InitTypeDef * handleLED, TIM_HandleTypeDef * handleTIM, TIM_OC_InitTypeDef * initTIM);
 
 //These are holdovers from the previous labs
 void setCurrentDigit(int newCurrentDigit);
@@ -76,11 +77,16 @@ void setSegmentSelectLines(int * segmentArray);
 void resetDigitSelectLines(void);
 void setDigitSelectLines(int digit);
 
-void initLED(GPIO_InitTypeDef * handleLED, TIM_HandleTypeDef * handleTIM, TIM_OC_InitTypeDef * initTIM);
-
+//Keypad functions
+int getRowSelected(void);
+int getColumnSelected(void);
+int powerOfTen(int exponent);
+int deleteLastNumber(int angle);
+//Project mode
 void display(void);
 
 #ifdef __cplusplus
 }
 #endif
 #endif /*__ pinoutConfig_H */
+
